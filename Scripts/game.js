@@ -22,7 +22,7 @@ console.clear();
         scoreBoard = document.getElementById('scoreBoard'),
 
         //declare members.
-        container, renderer, camera, mainLight,
+        container, renderer, camera, mainLight, topCamera,
         scene, ball, paddle1, paddle2, field, running,
         score = {
             player1: 0,
@@ -39,7 +39,7 @@ console.clear();
         ball.$stopped = false;
     }
 
-    function processCpuPaddle() {
+    /*function processCpuPaddle() {
         var ballPos = ball.position,
             cpuPos = paddle2.position;
 
@@ -48,7 +48,7 @@ console.clear();
         } else if (cpuPos.x - 100 < ballPos.x) {
             cpuPos.x += Math.min(ballPos.x - cpuPos.x, 6);
         }
-    }
+    }*/
 
     function processBallMovement() {
         if (!ball.$velocity) {
@@ -160,6 +160,30 @@ console.clear();
         running = false;
     }
 
+    function paddleControl(){
+        // player 1 go left
+        if(Key.isDown(65) && paddle1.position.x > -500){
+            paddle1.position.x -= 10;
+        }
+        // player 1 go right
+        if(Key.isDown(68) && paddle1.position.x < 500){
+            paddle1.position.x += 10;
+        }
+
+        // player 2 go left
+        if(Key.isDown(37) && paddle1.position.x > -500){
+            paddle2.position.x += 10;
+        }
+        // player 2 go right
+        if(Key.isDown(39) && paddle1.position.x < 500){
+            paddle2.position.x -= 10;
+        }
+
+        // camera tracking
+        topCamera.position.x = paddle2.position.x;
+        camera.position.x = paddle1.position.x;
+    }
+
     function render() {
         var SCREEN_W = 700;
         var SCREEN_H = 500;
@@ -190,14 +214,11 @@ console.clear();
 
         if (running) {
 
-
-
             requestAnimationFrame(render);
 
             processBallMovement();
-            processCpuPaddle();
-
-            renderer.render(scene, camera);
+            //processCpuPaddle();
+            paddleControl();
         }
     }
 
@@ -218,7 +239,7 @@ console.clear();
         camera.position.set(0, 100, FIELD_LENGTH / 2 + 500);
 
         topCamera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
-        //topCamera.position.set(-500, 00, 400);
+        topCamera.position.set(0, 100, -(FIELD_LENGTH / 2 + 500));
 
         scene = new THREE.Scene();
         scene.add(camera);
@@ -257,7 +278,7 @@ console.clear();
         updateScoreBoard();
         startRender();
 
-        renderer.domElement.addEventListener('mousemove', containerMouseMove);
+        //renderer.domElement.addEventListener('mousemove', containerMouseMove);
         renderer.domElement.style.cursor = 'none';
     }
 
@@ -271,11 +292,11 @@ console.clear();
         return paddle;
     }
 
-    function containerMouseMove(e) {
+    /*function containerMouseMove(e) {
         var mouseX = e.clientX;
         camera.position.x = paddle1.position.x = -((WIDTH - mouseX) / WIDTH * FIELD_WIDTH) + (FIELD_WIDTH / 2);
         topCamera.position.x = paddle2.position.x;
-    }
+    }*/
 
     init();
 })(window, window.document, window.THREE);
