@@ -261,7 +261,7 @@ console.clear();
 
         var ballGeometry = new THREE.SphereGeometry(BALL_RADIUS, 16, 16),
             ballMaterial = new THREE.MeshLambertMaterial({
-                color: 0xCC0000
+                color: 0x0FF0FF
             });
         ball = new THREE.Mesh(ballGeometry, ballMaterial);
         scene.add(ball);
