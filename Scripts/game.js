@@ -171,11 +171,11 @@ console.clear();
         }
 
         // player 2 go left
-        if(Key.isDown(37) && paddle1.position.x > -500){
+        if(Key.isDown(37) && paddle2.position.x < 500){
             paddle2.position.x += 10;
         }
         // player 2 go right
-        if(Key.isDown(39) && paddle1.position.x < 500){
+        if(Key.isDown(39) && paddle2.position.x > -500){
             paddle2.position.x -= 10;
         }
 
