@@ -1,7 +1,3 @@
-/**
- * Copyright (c) 2013 Ben Lesh
- * Pong ThreeJS demo
- */
 console.clear();
 
 (function(window, document, THREE) {
@@ -39,7 +35,7 @@ console.clear();
         ball.$stopped = false;
     }
 
-    /*function processCpuPaddle() {
+    function processCpuPaddle() {
         var ballPos = ball.position,
             cpuPos = paddle2.position;
 
@@ -48,7 +44,7 @@ console.clear();
         } else if (cpuPos.x - 100 < ballPos.x) {
             cpuPos.x += Math.min(ballPos.x - cpuPos.x, 6);
         }
-    }*/
+    }
 
     function processBallMovement() {
         if (!ball.$velocity) {
@@ -98,7 +94,7 @@ console.clear();
         ballPos.z += ball.$velocity.z;
 
         // add an arc to the ball's flight. Comment this out for boring, flat pong.
-        ballPos.y = -((ballPos.z - 1) * (ballPos.z - 1) / 5000) + 435;
+        //ballPos.y = -((ballPos.z - 1) * (ballPos.z - 1) / 5000) + 435;
     }
 
     function isSideCollision() {
@@ -232,14 +228,14 @@ console.clear();
 
         renderer = new THREE.WebGLRenderer();
         renderer.setSize(WIDTH, HEIGHT);
-        renderer.setClearColor(0x9999BB, 1);
+        renderer.setClearColor(0x000000, 1);
         container.appendChild(renderer.domElement);
 
         camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
-        camera.position.set(0, 100, FIELD_LENGTH / 2 + 500);
+        camera.position.set(0, 200, FIELD_LENGTH / 2 + 500);
 
         topCamera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
-        topCamera.position.set(0, 100, -(FIELD_LENGTH / 2 + 500));
+        topCamera.position.set(0, 200, -(FIELD_LENGTH / 2 + 500));
 
         scene = new THREE.Scene();
         scene.add(camera);
@@ -254,9 +250,9 @@ console.clear();
         field.position.set(0, -50, 0);
 
         scene.add(field);
-        paddle1 = addPaddle();
+        paddle1 = addPaddle(0xAA3333);
         paddle1.position.z = FIELD_LENGTH / 2;
-        paddle2 = addPaddle();
+        paddle2 = addPaddle(0x3F51B5);
         paddle2.position.z = -FIELD_LENGTH / 2;
 
         var ballGeometry = new THREE.SphereGeometry(BALL_RADIUS, 16, 16),
@@ -282,10 +278,10 @@ console.clear();
         renderer.domElement.style.cursor = 'none';
     }
 
-    function addPaddle() {
+    function addPaddle(color_paddle) {
         var paddleGeometry = new THREE.CubeGeometry(PADDLE_WIDTH, PADDLE_HEIGHT, 10, 1, 1, 1),
             paddleMaterial = new THREE.MeshLambertMaterial({
-                color: 0xCCCCCC
+                color: color_paddle
             }),
             paddle = new THREE.Mesh(paddleGeometry, paddleMaterial);
         scene.add(paddle);

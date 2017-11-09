@@ -4,11 +4,85 @@
   <head>
     <script data-require="three.js@0.0.0-r61" data-semver="0.0.0-r61" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r61/three.min.js"></script>
     <link rel="stylesheet" href="style.css" />
+      <style>
+          #canvas-align {
+              position: relative;
+              width: 854px;
+              height: 480px;
+              margin: auto;
+          }
+          #hud {
+              position: absolute;
+              top: 0;
+              width: 854px;
+              height: 480px;
+              margin: auto;
+              z-index: 3;
+              display: none;
+          }
+          .player_score, #ammo, #log {
+              position: absolute;
+              border: 3px solid #FFF;
+              border-radius: 5px;
+              color: #FFF;
+              font-family: arial;
+          }
+          #health {
+              bottom: 10px;
+              left: 10px;
+              background: #AA3333;
+              font-size: 20pt;
+              font-weight: bold;
+              padding: 5px;
+          }
+          .player_1_score {
+              bottom: 10px;
+              left: 10px;
+              background: #AA3333;
+              font-size: 20pt;
+              font-weight: bold;
+              padding: 5px;
+          }
+          .player_2_score {
+              bottom: 10px;
+              left: 10px;
+              background: #3F51B5;
+              font-size: 20pt;
+              font-weight: bold;
+              padding: 5px;
+          }
+          .transparent #health {
+              background: rgba(120, 20, 20, 0.5);
+          }
+          .perspective #health {
+              -webkit-transform: rotateY(25deg);
+              -moz-transform: rotateY(25deg);
+          }
+          .animated #health, .animated #ammo {
+              -webkit-animation-duration: 1s;
+              -webkit-animation-name: heartbeat;
+              -webkit-animation-iteration-count: infinite;
+
+              -moz-animation-duration: 1s;
+              -moz-animation-name: heartbeat;
+              -moz-animation-iteration-count: infinite;
+          }
+      </style>
   </head>
 
   <body>
-    <h3 id="scoreBoard"></h3>
-    <div id="container"></div>
+    <h3 id="scoreBoard" style="visibility: hidden"></h3>
+    <div id="container" style="width: 700px">
+        <div style="position: relative;">
+            <div class="player_score player_1_score" style="left: 650px; top: 200px; width: 30px; height: 30px">
+                10
+            </div>
+            <div class="player_score player_2_score" style="left: 650px; top: 255px ; width: 30px; height: 30px">
+                10
+            </div>
+        </div>
+    </div>
+
     <script src="Scripts/keyboard.js"></script>
     <script src="Scripts/game.js"></script>
   </body>
