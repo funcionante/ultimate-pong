@@ -15,7 +15,9 @@ console.clear();
         PADDLE_HEIGHT = 30,
 
         //get the scoreboard element.
-        scoreBoard = document.getElementById('scoreBoard'),
+        //scoreBoard = document.getElementById('scoreBoard'),
+        player_1_score = document.getElementById('player_1_score'),
+        player_2_score = document.getElementById('player_2_score'),
 
         //declare members.
         container, renderer, camera, mainLight, topCamera,
@@ -134,8 +136,8 @@ console.clear();
     }
 
     function updateScoreBoard() {
-        scoreBoard.innerHTML = 'Player 1: ' + score.player1 + ' Player 2: ' +
-            score.player2;
+        player_1_score.innerHTML = score.player1;
+        player_2_score.innerHTML = score.player2;
     }
 
     function stopBall() {
