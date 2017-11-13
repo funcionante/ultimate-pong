@@ -11,11 +11,16 @@ console.clear();
         FIELD_WIDTH = 1200,
         FIELD_LENGTH = 3000,
         BALL_RADIUS = 20,
+        BALL_JUMP_POSITION = 0,
 
         //get the scoreboard element.
         //scoreBoard = document.getElementById('scoreBoard'),
         player_1_score = document.getElementById('player_1_score'),
         player_2_score = document.getElementById('player_2_score'),
+
+        //playerPower
+        player_1_power = document.getElementById('player_1_power'),
+        player_2_power = document.getElementById('player_2_power'),
 
         //declare members.
         container, renderer, camera, mainLight, topCamera,
@@ -83,15 +88,25 @@ console.clear();
             itemDirection = 1;
         }
 
-        item1.position.y += 1 * itemDirection;
+        item1.position.y += itemDirection;
 
         // IF HIT ITEM
         if (ballObjectCollision(ball,item1,BALL_RADIUS,TESTITEM)){
             if(ball.$velocity.z < 0){
                 console.log("Player 1 power!");
+                player_1_power.innerHTML ='<img src="https://image.freepik.com/free-icon/feet-kicking-a-soccer-ball_318-27303.jpg" height="40px" width="40px">';
+                scene.remove(item1);
+                item1.position.x = 10000;
+                item1.position.y = 10000;
+                item1.position.z = 10000;
             }
             else{
                 console.log("Player 2 power!");
+                player_2_power.innerHTML ='<img src="https://image.freepik.com/free-icon/feet-kicking-a-soccer-ball_318-27303.jpg" height="40px" width="40px">';
+                scene.remove(item1);
+                item1.position.x = 10000;
+                item1.position.y = 10000;
+                item1.position.z = 10000;
             }
         }
 
@@ -127,8 +142,17 @@ console.clear();
         ballPos.x += ball.$velocity.x;
         ballPos.z += ball.$velocity.z;
 
+        if(BALL_JUMP_POSITION !== 0){
+            ballPos.y = -(ballPos.z-BALL_JUMP_POSITION)*(ballPos.z+BALL_JUMP_POSITION+200)/1500;
+            if(ballPos.y === 0){
+                BALL_JUMP_POSITION = 0;
+            }
+        }
+
         // add an arc to the ball's flight. Comment this out for boring, flat pong.
         //ballPos.y = -((ballPos.z - 1) * (ballPos.z - 1) / 5000) + 435;
+        //if(ballPos.z <= 500 && ballPos.z >= -500)
+            //ballPos.y = -(ballPos.z+500)*(ballPos.z-500)/1500;
     }
 
     function isSideCollision() {
@@ -214,6 +238,10 @@ console.clear();
         return collision;
     }
 
+    function ballJump(ball){
+        BALL_JUMP_POSITION = ball.position.z;
+    }
+
     function scoreBy(playerName) {
         addPoint(playerName);
         updateScoreBoard();
@@ -261,6 +289,11 @@ console.clear();
         // player 2 go right
         if(Key.isDown(39) && paddle2.position.x > -500){
             paddle2.position.x -= 10;
+        }
+
+        // ball jumps
+        if(Key.isDown(32)){
+            ballJump(ball);
         }
 
         // camera tracking
@@ -344,6 +377,7 @@ console.clear();
         paddle2.position.z = -FIELD_LENGTH / 2;
         item1 = addItem();
         item1.position.z = 0;
+        item1.position.x = -150;
 
         var ballGeometry = new THREE.SphereGeometry(BALL_RADIUS, 16, 16),
             ballMaterial = new THREE.MeshLambertMaterial({
