@@ -11,8 +11,6 @@ console.clear();
         FIELD_WIDTH = 1200,
         FIELD_LENGTH = 3000,
         BALL_RADIUS = 20,
-        PADDLE_WIDTH = 200,
-        PADDLE_HEIGHT = 30,
 
         //get the scoreboard element.
         //scoreBoard = document.getElementById('scoreBoard'),
@@ -21,11 +19,14 @@ console.clear();
 
         //declare members.
         container, renderer, camera, mainLight, topCamera,
-        scene, ball, paddle1, paddle2, field, running,
+        scene, ball, paddle1, paddle2, item1, field, running,
         score = {
             player1: 0,
             player2: 0
-        };
+        },
+        PADDLE1DIMS = {z: 10, y: 30, x: 200},
+        PADDLE2DIMS = {z: 10, y: 30, x: 200},
+        TESTITEM = {z: 50, y: 50, x: 50};
 
 
     function startBallMovement() {
@@ -63,13 +64,28 @@ console.clear();
             ball.$velocity.x *= -1;
         }
 
-        if (isPaddle1Collision()) {
+        // IF HIT PADDLE 1
+        if (ballObjectCollision(ball,paddle1,BALL_RADIUS,PADDLE1DIMS)){
             hitBallBack(paddle1);
         }
 
-        if (isPaddle2Collision()) {
+        // IF HIT PADDLE 2
+        if (ballObjectCollision(ball,paddle2,BALL_RADIUS,PADDLE2DIMS)){
             hitBallBack(paddle2);
         }
+
+        // IF HIT ITEM
+        if (ballObjectCollision(ball,item1,BALL_RADIUS,TESTITEM)){
+            console.log("hit");
+        }
+
+        /*if (isPaddle1Collision()) {
+            hitBallBack(paddle1);
+        }*/
+
+        /*if (isPaddle2Collision()) {
+            hitBallBack(paddle2);
+        }*/
 
         if (isPastPaddle1()) {
             scoreBy('player2');
@@ -110,22 +126,76 @@ console.clear();
         ball.$velocity.z *= -1;
     }
 
+    /* TO DELETE
     function isPaddle2Collision() {
         return ball.position.z - BALL_RADIUS <= paddle2.position.z &&
             isBallAlignedWithPaddle(paddle2);
-    }
+    }*/
 
-    function isPaddle1Collision() {
-        return ball.position.z + BALL_RADIUS >= paddle1.position.z &&
-            isBallAlignedWithPaddle(paddle1);
-    }
+    function ballObjectCollision(ball,object,ball_radius,object_dims){
+        var collision = false;
 
-    function isBallAlignedWithPaddle(paddle) {
-        var halfPaddleWidth = PADDLE_WIDTH / 2,
-            paddleX = paddle.position.x,
-            ballX = ball.position.x;
-        return ballX > paddleX - halfPaddleWidth &&
-            ballX < paddleX + halfPaddleWidth;
+        // x coordinate collision
+        var object_left_x_limit = object.position.x - object_dims.x / 2,
+            object_right_x_limit = object.position.x + object_dims.x / 2,
+            ball_left_x_limit = ball.position.x - ball_radius,
+            ball_right_x_limit = ball.position.x + ball_radius;
+
+        if(object_left_x_limit < ball_left_x_limit || object_left_x_limit < ball_right_x_limit){
+            collision = true;
+        }
+        else{
+            return false;
+        }
+
+        if(object_right_x_limit > ball_left_x_limit || object_right_x_limit > ball_right_x_limit){
+            collision = true;
+        }
+        else{
+            return false;
+        }
+
+        // y coordinate collision
+        var object_left_y_limit = object.position.y - object_dims.y / 2,
+            object_right_y_limit = object.position.y + object_dims.y / 2,
+            ball_left_y_limit = ball.position.y - ball_radius,
+            ball_right_y_limit = ball.position.y + ball_radius;
+
+        if(object_left_y_limit < ball_left_y_limit || object_left_y_limit < ball_right_y_limit){
+            collision = true;
+        }
+        else{
+            return false;
+        }
+
+        if(object_right_y_limit > ball_left_y_limit || object_right_y_limit > ball_right_y_limit){
+            collision = true;
+        }
+        else{
+            return false;
+        }
+
+        // z coordinate collision
+        var object_left_z_limit = object.position.z - object_dims.z / 2,
+            object_right_z_limit = object.position.z + object_dims.z / 2,
+            ball_left_z_limit = ball.position.z - ball_radius,
+            ball_right_z_limit = ball.position.z + ball_radius;
+
+        if(object_left_z_limit < ball_left_z_limit || object_left_z_limit < ball_right_z_limit){
+            collision = true;
+        }
+        else{
+            return false;
+        }
+
+        if(object_right_z_limit > ball_left_z_limit || object_right_z_limit > ball_right_z_limit){
+            collision = true;
+        }
+        else{
+            return false;
+        }
+
+        return collision;
     }
 
     function scoreBy(playerName) {
@@ -252,10 +322,13 @@ console.clear();
         field.position.set(0, -50, 0);
 
         scene.add(field);
-        paddle1 = addPaddle(0xAA3333);
+        paddle1 = addPaddle(PADDLE1DIMS,0xAA3333);
         paddle1.position.z = FIELD_LENGTH / 2;
-        paddle2 = addPaddle(0x3F51B5);
+        paddle2 = addPaddle(PADDLE2DIMS,0x3F51B5);
         paddle2.position.z = -FIELD_LENGTH / 2;
+        item1 = addItem();
+        item1.position.z = 0;
+        item1.position.x = -100;
 
         var ballGeometry = new THREE.SphereGeometry(BALL_RADIUS, 16, 16),
             ballMaterial = new THREE.MeshLambertMaterial({
@@ -280,14 +353,26 @@ console.clear();
         renderer.domElement.style.cursor = 'none';
     }
 
-    function addPaddle(color_paddle) {
-        var paddleGeometry = new THREE.CubeGeometry(PADDLE_WIDTH, PADDLE_HEIGHT, 10, 1, 1, 1),
+    function addPaddle(paddle_prop, color_paddle) {
+        var paddleGeometry = new THREE.CubeGeometry(paddle_prop.x, paddle_prop.y, paddle_prop.z, 1, 1, 1),
             paddleMaterial = new THREE.MeshLambertMaterial({
                 color: color_paddle
             }),
             paddle = new THREE.Mesh(paddleGeometry, paddleMaterial);
         scene.add(paddle);
+
         return paddle;
+    }
+
+    function addItem(){
+        var itemGeometry = new THREE.CubeGeometry(50, 50, 50, 1, 1, 1),
+            itemMaterial = new THREE.MeshLambertMaterial({
+                color: 0xff0000
+            }),
+            item = new THREE.Mesh(itemGeometry, itemMaterial);
+        scene.add(item);
+
+        return item;
     }
 
     /*function containerMouseMove(e) {
