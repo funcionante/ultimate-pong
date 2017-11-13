@@ -26,7 +26,8 @@ console.clear();
         },
         PADDLE1DIMS = {z: 10, y: 30, x: 200},
         PADDLE2DIMS = {z: 10, y: 30, x: 200},
-        TESTITEM = {z: 50, y: 50, x: 50};
+        TESTITEM = {z: 50, y: 50, x: 50},
+        itemDirection = 1;
 
 
     function startBallMovement() {
@@ -73,10 +74,25 @@ console.clear();
         if (ballObjectCollision(ball,paddle2,BALL_RADIUS,PADDLE2DIMS)){
             hitBallBack(paddle2);
         }
+        item1.rotation.y += 0.1;
+
+        if (item1.position.y >= 20){
+            itemDirection = -1;
+        }
+        else if(item1.position.y <= 0){
+            itemDirection = 1;
+        }
+
+        item1.position.y += 1 * itemDirection;
 
         // IF HIT ITEM
         if (ballObjectCollision(ball,item1,BALL_RADIUS,TESTITEM)){
-            console.log("hit");
+            if(ball.$velocity.z < 0){
+                console.log("Player 1 power!");
+            }
+            else{
+                console.log("Player 2 power!");
+            }
         }
 
         /*if (isPaddle1Collision()) {
@@ -328,7 +344,6 @@ console.clear();
         paddle2.position.z = -FIELD_LENGTH / 2;
         item1 = addItem();
         item1.position.z = 0;
-        item1.position.x = -100;
 
         var ballGeometry = new THREE.SphereGeometry(BALL_RADIUS, 16, 16),
             ballMaterial = new THREE.MeshLambertMaterial({
@@ -367,7 +382,7 @@ console.clear();
     function addItem(){
         var itemGeometry = new THREE.CubeGeometry(50, 50, 50, 1, 1, 1),
             itemMaterial = new THREE.MeshLambertMaterial({
-                color: 0xff0000
+                color: 0xFF0000
             }),
             item = new THREE.Mesh(itemGeometry, itemMaterial);
         scene.add(item);
