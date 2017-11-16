@@ -141,10 +141,11 @@ console.clear();
         //update the ball's position.
         ballPos.x += ball.$velocity.x;
         ballPos.z += ball.$velocity.z;
+        ballPos.y = 0;
 
         if(BALL_JUMP_POSITION !== 0){
-            ballPos.y = -(ballPos.z-BALL_JUMP_POSITION)*(ballPos.z+BALL_JUMP_POSITION+200)/1500;
-            if(ballPos.y === 0){
+            ballPos.y = -(ballPos.z-BALL_JUMP_POSITION)*(ballPos.z-1400-BALL_JUMP_POSITION)/1000;
+            if(ballPos.y <= 0){
                 BALL_JUMP_POSITION = 0;
             }
         }
@@ -293,7 +294,9 @@ console.clear();
 
         // ball jumps
         if(Key.isDown(32)){
-            ballJump(ball);
+            if(BALL_JUMP_POSITION === 0) {
+                ballJump(ball);
+            }
         }
 
         // camera tracking
