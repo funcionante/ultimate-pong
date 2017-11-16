@@ -24,14 +24,16 @@ console.clear();
 
         //declare members.
         container, renderer, camera, mainLight, topCamera,
-        scene, ball, paddle1, paddle2, item1, field, running,
+        scene, ball, paddle1, paddle2, field, running,
         score = {
             player1: 0,
             player2: 0
         },
         PADDLE1DIMS = {z: 10, y: 30, x: 200},
         PADDLE2DIMS = {z: 10, y: 30, x: 200},
-        TESTITEM = {z: 50, y: 50, x: 50},
+        player1Item = "none",
+        player2Item = "none",
+        fieldItem = {name: "", instance: "", dimension: {x: 50, y: 50, z: 50}},
         itemDirection = 1;
 
 
@@ -79,44 +81,36 @@ console.clear();
         if (ballObjectCollision(ball,paddle2,BALL_RADIUS,PADDLE2DIMS)){
             hitBallBack(paddle2);
         }
-        item1.rotation.y += 0.1;
 
-        if (item1.position.y >= 20){
-            itemDirection = -1;
-        }
-        else if(item1.position.y <= 0){
-            itemDirection = 1;
-        }
+        // if item exists, rotate
+        if(fieldItem.instance !== ""){
+            fieldItem.instance.rotation.y += 0.1;
 
-        item1.position.y += itemDirection;
-
-        // IF HIT ITEM
-        if (ballObjectCollision(ball,item1,BALL_RADIUS,TESTITEM)){
-            if(ball.$velocity.z < 0){
-                console.log("Player 1 power!");
-                player_1_power.innerHTML ='<img src="https://image.freepik.com/free-icon/feet-kicking-a-soccer-ball_318-27303.jpg" height="40px" width="40px">';
-                scene.remove(item1);
-                item1.position.x = 10000;
-                item1.position.y = 10000;
-                item1.position.z = 10000;
+            if (fieldItem.instance.position.y >= 20){
+                itemDirection = -1;
             }
-            else{
-                console.log("Player 2 power!");
-                player_2_power.innerHTML ='<img src="https://image.freepik.com/free-icon/feet-kicking-a-soccer-ball_318-27303.jpg" height="40px" width="40px">';
-                scene.remove(item1);
-                item1.position.x = 10000;
-                item1.position.y = 10000;
-                item1.position.z = 10000;
+            else if(fieldItem.instance.position.y <= 0){
+                itemDirection = 1;
+            }
+
+            fieldItem.instance.position.y += itemDirection;
+
+            // if hit the item, gain power
+            if (ballObjectCollision(ball,fieldItem.instance,BALL_RADIUS,fieldItem.dimension)){
+                console.log("item");
+                if(ball.$velocity.z < 0){
+                    console.log("Player 1 power!");
+                    gainPower(fieldItem.name,1);
+                }
+                else{
+                    console.log("Player 2 power!");
+                    gainPower(fieldItem.name,2);
+                }
+
+                scene.remove(fieldItem.instance);
+                fieldItem.instance = "";
             }
         }
-
-        /*if (isPaddle1Collision()) {
-            hitBallBack(paddle1);
-        }*/
-
-        /*if (isPaddle2Collision()) {
-            hitBallBack(paddle2);
-        }*/
 
         if (isPastPaddle1()) {
             scoreBy('player2');
@@ -129,6 +123,28 @@ console.clear();
 
     function isPastPaddle1() {
         return ball.position.z > paddle1.position.z + 100;
+    }
+
+    function gainPower(itemName, playerNumber){
+        if(playerNumber === 1){
+            player1Item = itemName;
+            player_1_power.innerHTML ='<img src="https://image.freepik.com/free-icon/feet-kicking-a-soccer-ball_318-27303.jpg" height="40px" width="40px">';
+        }
+        else if(playerNumber === 2){
+            player2Item = itemName;
+            player_2_power.innerHTML ='<img src="https://image.freepik.com/free-icon/feet-kicking-a-soccer-ball_318-27303.jpg" height="40px" width="40px">';
+        }
+    }
+
+    function loosePower(playerNumber){
+        if(playerNumber === 1){
+            player1Item = "none";
+            player_1_power.innerHTML ='<img src="https://i.ytimg.com/vi/J3pF2jkQ4vc/maxresdefault.jpg" height="40px" width="40px">';
+        }
+        else if(playerNumber === 2){
+            player2Item = "none";
+            player_2_power.innerHTML ='<img src="https://i.ytimg.com/vi/J3pF2jkQ4vc/maxresdefault.jpg" height="40px" width="40px">';
+        }
     }
 
     function isPastPaddle2() {
@@ -144,16 +160,17 @@ console.clear();
         ballPos.y = 0;
 
         if(BALL_JUMP_POSITION !== 0){
-            ballPos.y = -(ballPos.z-BALL_JUMP_POSITION)*(ballPos.z-1400-BALL_JUMP_POSITION)/1000;
+            if(ball.$velocity.z > 0){
+                ballPos.y = -(ballPos.z-BALL_JUMP_POSITION)*(ballPos.z-1400-BALL_JUMP_POSITION)/1000;
+            }
+            else{
+                ballPos.y = -(ballPos.z-BALL_JUMP_POSITION)*(ballPos.z+1400-BALL_JUMP_POSITION)/1000;
+            }
+
             if(ballPos.y <= 0){
                 BALL_JUMP_POSITION = 0;
             }
         }
-
-        // add an arc to the ball's flight. Comment this out for boring, flat pong.
-        //ballPos.y = -((ballPos.z - 1) * (ballPos.z - 1) / 5000) + 435;
-        //if(ballPos.z <= 500 && ballPos.z >= -500)
-            //ballPos.y = -(ballPos.z+500)*(ballPos.z-500)/1500;
     }
 
     function isSideCollision() {
@@ -167,16 +184,10 @@ console.clear();
         ball.$velocity.z *= -1;
     }
 
-    /* TO DELETE
-    function isPaddle2Collision() {
-        return ball.position.z - BALL_RADIUS <= paddle2.position.z &&
-            isBallAlignedWithPaddle(paddle2);
-    }*/
-
     function ballObjectCollision(ball,object,ball_radius,object_dims){
         var collision = false;
 
-        // x coordinate collision
+        // x coordinate collision1
         var object_left_x_limit = object.position.x - object_dims.x / 2,
             object_right_x_limit = object.position.x + object_dims.x / 2,
             ball_left_x_limit = ball.position.x - ball_radius,
@@ -292,10 +303,21 @@ console.clear();
             paddle2.position.x -= 10;
         }
 
-        // ball jumps
+        // player 1 special power
         if(Key.isDown(32)){
-            if(BALL_JUMP_POSITION === 0) {
-                ballJump(ball);
+            switch (player1Item){
+                case "jump":
+                    ballJump(ball);
+                    loosePower(1);
+            }
+        }
+
+        // player 2 special power
+        if(Key.isDown(190)){
+            switch (player2Item){
+                case "jump":
+                    ballJump(ball);
+                    loosePower(2);
             }
         }
 
@@ -337,7 +359,7 @@ console.clear();
             requestAnimationFrame(render);
 
             processBallMovement();
-            //processCpuPaddle();
+            processCpuPaddle();
             paddleControl();
         }
     }
@@ -345,6 +367,13 @@ console.clear();
     function reset() {
         ball.position.set(0, 0, 0);
         ball.$velocity = null;
+    }
+
+    function generateRandomItem(){
+        item = addItem();
+        item.position.z = 0;
+        item.position.x = 0;
+        return item;
     }
 
     function init() {
@@ -378,9 +407,9 @@ console.clear();
         paddle1.position.z = FIELD_LENGTH / 2;
         paddle2 = addPaddle(PADDLE2DIMS,0x3F51B5);
         paddle2.position.z = -FIELD_LENGTH / 2;
-        item1 = addItem();
-        item1.position.z = 0;
-        item1.position.x = -150;
+
+        fieldItem.name = "jump";
+        fieldItem.instance = generateRandomItem();
 
         var ballGeometry = new THREE.SphereGeometry(BALL_RADIUS, 16, 16),
             ballMaterial = new THREE.MeshLambertMaterial({
