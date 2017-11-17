@@ -31,6 +31,7 @@ console.clear();
         },
         PADDLE1DIMS = {z: 10, y: 30, x: 200},
         PADDLE2DIMS = {z: 10, y: 30, x: 200},
+        trapWall = {startDim: {x: 50, y: 10, z: 50}, dimension: {x: 0, y: 0, z: 50}},
         player1Item = "none",
         player2Item = "none",
         fieldItem = {name: "", instance: "", dimension: {x: 50, y: 50, z: 50}},
@@ -52,7 +53,8 @@ console.clear();
 
         if (cpuPos.x - 100 > ballPos.x) {
             cpuPos.x -= Math.min(cpuPos.x - ballPos.x, 6);
-        } else if (cpuPos.x - 100 < ballPos.x) {
+        }
+        else if (cpuPos.x - 100 < ballPos.x) {
             cpuPos.x += Math.min(ballPos.x - cpuPos.x, 6);
         }
     }
@@ -75,6 +77,16 @@ console.clear();
         // IF HIT PADDLE 1
         if (ballObjectCollision(ball,paddle1,BALL_RADIUS,PADDLE1DIMS)){
             hitBallBack(paddle1);
+        }
+
+        // if hit the left wall
+        if (ballObjectCollision(ball,trapWall.left,BALL_RADIUS,trapWall.dimension)){
+            hitBallBackWall(trapWall.left);
+        }
+
+        // if hit the right wall
+        if (ballObjectCollision(ball,trapWall.right,BALL_RADIUS,trapWall.dimension)){
+            hitBallBackWall(trapWall.right);
         }
 
         // IF HIT PADDLE 2
@@ -181,6 +193,12 @@ console.clear();
 
     function hitBallBack(paddle) {
         ball.$velocity.x = (ball.position.x - paddle.position.x) / 5;
+        ball.$velocity.z *= -1;
+    }
+
+    // TODO: improve bounce algorithm
+    function hitBallBackWall(paddle) {
+        ball.$velocity.x = (ball.position.x - paddle.position.x) / 10;
         ball.$velocity.z *= -1;
     }
 
@@ -358,6 +376,38 @@ console.clear();
 
             requestAnimationFrame(render);
 
+            // wall gaining height
+            if(trapWall.left.position.y < 100){
+                trapWall.left.scale.y += 0.1;
+                trapWall.left.position.y += 0.5;
+                trapWall.dimension.y += trapWall.startDim.y * 0.1;
+            }
+
+            if(trapWall.right.position.y < 100){
+                trapWall.right.scale.y += 0.1;
+                trapWall.right.position.y += 0.55;
+            }
+
+            if(trapWall.left.position.y >= 100 && trapWall.right.position.y >= 100){
+                // wall joining
+                if(trapWall.left.position.x <= -300){
+                    trapWall.left.scale.x += 0.03;
+                    trapWall.left.position.x += 0.75;
+                    trapWall.dimension.x += trapWall.startDim.x * 0.03;
+                }
+
+                if(trapWall.right.position.x >= 300){
+                    trapWall.right.scale.x += 0.03;
+                    trapWall.right.position.x -= 0.75;
+                }
+
+                // wall advances on target
+                if(trapWall.left.position.x >= -300 && trapWall.right.position.x <= 300){
+                    trapWall.left.position.z += 1;
+                    trapWall.right.position.z += 1;
+                }
+            }
+
             processBallMovement();
             processCpuPaddle();
             paddleControl();
@@ -374,6 +424,25 @@ console.clear();
         item.position.z = 0;
         item.position.x = 0;
         return item;
+    }
+
+    function generateTrapWall(pos){
+        var itemGeometry = new THREE.CubeGeometry(trapWall.startDim.x, trapWall.startDim.y, trapWall.startDim.z, 1, 1, 1),
+            itemMaterial = new THREE.MeshLambertMaterial({
+                color: 0xFF0000
+            }),
+            wall = new THREE.Mesh(itemGeometry, itemMaterial);
+
+        // adding wall to scene
+        scene.add(wall);
+
+        // defining wall positions
+        wall.position.y = -55;
+        wall.position.z = 0;
+        wall.position.x = pos;
+
+        return wall;
+
     }
 
     function init() {
@@ -407,6 +476,9 @@ console.clear();
         paddle1.position.z = FIELD_LENGTH / 2;
         paddle2 = addPaddle(PADDLE2DIMS,0x3F51B5);
         paddle2.position.z = -FIELD_LENGTH / 2;
+
+        trapWall.left = generateTrapWall(-550);
+        trapWall.right = generateTrapWall(550);
 
         fieldItem.name = "jump";
         fieldItem.instance = generateRandomItem();
