@@ -376,41 +376,74 @@ console.clear();
 
             requestAnimationFrame(render);
 
-            // wall gaining height
-            if(trapWall.left.position.y < 100){
-                trapWall.left.scale.y += 0.1;
-                trapWall.left.position.y += 0.5;
-                trapWall.dimension.y += trapWall.startDim.y * 0.1;
+            if(trapWall.left.position.z <= 950 && trapWall.left.position.z >= -950){
+                wallMove();
             }
-
-            if(trapWall.right.position.y < 100){
-                trapWall.right.scale.y += 0.1;
-                trapWall.right.position.y += 0.55;
-            }
-
-            if(trapWall.left.position.y >= 100 && trapWall.right.position.y >= 100){
-                // wall joining
-                if(trapWall.left.position.x <= -300){
-                    trapWall.left.scale.x += 0.03;
-                    trapWall.left.position.x += 0.75;
-                    trapWall.dimension.x += trapWall.startDim.x * 0.03;
-                }
-
-                if(trapWall.right.position.x >= 300){
-                    trapWall.right.scale.x += 0.03;
-                    trapWall.right.position.x -= 0.75;
-                }
-
-                // wall advances on target
-                if(trapWall.left.position.x >= -300 && trapWall.right.position.x <= 300){
-                    trapWall.left.position.z += 1;
-                    trapWall.right.position.z += 1;
-                }
+            else{
+                wallRemove();
             }
 
             processBallMovement();
             processCpuPaddle();
             paddleControl();
+        }
+    }
+
+    function wallMove(){
+        // wall gaining height
+        if(trapWall.left.position.y < 100){
+            trapWall.left.scale.y += 0.1;
+            trapWall.left.position.y += 0.5;
+
+            trapWall.right.scale.y += 0.1;
+            trapWall.right.position.y += 0.5;
+
+            trapWall.dimension.y += trapWall.startDim.y * 0.1;
+        }
+
+        if(trapWall.left.position.y >= 100 && trapWall.right.position.y >= 100){
+            // wall joining
+            if(trapWall.left.position.x <= -325){
+                trapWall.left.scale.x += 0.03;
+                trapWall.left.position.x += 0.75;
+
+                trapWall.right.scale.x += 0.03;
+                trapWall.right.position.x -= 0.75;
+
+                trapWall.dimension.x += trapWall.startDim.x * 0.03;
+            }
+
+            // wall advances on target
+            if(trapWall.left.position.x >= -325 && trapWall.right.position.x <= 325){
+                trapWall.left.position.z += 1;
+                trapWall.right.position.z += 1;
+            }
+        }
+    }
+
+    function wallRemove(){
+        // wall separation
+        if(trapWall.left.position.x >= -575){
+            trapWall.left.scale.x -= 0.03;
+            trapWall.left.position.x -= 0.75;
+
+            trapWall.right.scale.x -= 0.03;
+            trapWall.right.position.x += 0.75;
+
+            trapWall.dimension.x -= trapWall.startDim.x * 0.03;
+        }
+
+        if(trapWall.left.position.x <= -100 && trapWall.right.position.x >= 100){
+            // wall loose height
+            if(trapWall.left.position.y > -75){
+                trapWall.left.scale.y -= 0.1;
+                trapWall.left.position.y -= 0.5;
+
+                trapWall.right.scale.y -= 0.1;
+                trapWall.right.position.y -= 0.5;
+
+                trapWall.dimension.y -= trapWall.startDim.y * 0.1;
+            }
         }
     }
 
@@ -477,8 +510,8 @@ console.clear();
         paddle2 = addPaddle(PADDLE2DIMS,0x3F51B5);
         paddle2.position.z = -FIELD_LENGTH / 2;
 
-        trapWall.left = generateTrapWall(-550);
-        trapWall.right = generateTrapWall(550);
+        trapWall.left = generateTrapWall(-575);
+        trapWall.right = generateTrapWall(575);
 
         fieldItem.name = "jump";
         fieldItem.instance = generateRandomItem();
