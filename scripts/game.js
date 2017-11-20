@@ -35,6 +35,7 @@ console.clear();
         player2Item = "none",
         fieldItem = {name: "", instance: "", dimension: {x: 50, y: 50, z: 50}, timestamp: Date.now()},
         farItem = {status: "inactive", player: 0},
+        freezeBall = {instance: "", status: "inactive", color: 0xB4CFFA, player: 0, radius: 10, pos: 0, freeze: 0},
         itemDirection = 1,
         backgroundSphere;
 
@@ -205,14 +206,14 @@ console.clear();
         ball.$velocity.z *= -1;
     }
 
-    function ballObjectCollision(ball,object,ball_radius,object_dims){
+    function ballObjectCollision(ballObject,object,ball_radius,object_dims){
         var collision = false;
 
         // x coordinate collision1
         var object_left_x_limit = object.position.x - object_dims.x / 2,
             object_right_x_limit = object.position.x + object_dims.x / 2,
-            ball_left_x_limit = ball.position.x - ball_radius,
-            ball_right_x_limit = ball.position.x + ball_radius;
+            ball_left_x_limit = ballObject.position.x - ball_radius,
+            ball_right_x_limit = ballObject.position.x + ball_radius;
 
         if(object_left_x_limit < ball_left_x_limit || object_left_x_limit < ball_right_x_limit){
             collision = true;
@@ -231,8 +232,8 @@ console.clear();
         // y coordinate collision
         var object_left_y_limit = object.position.y - object_dims.y / 2,
             object_right_y_limit = object.position.y + object_dims.y / 2,
-            ball_left_y_limit = ball.position.y - ball_radius,
-            ball_right_y_limit = ball.position.y + ball_radius;
+            ball_left_y_limit = ballObject.position.y - ball_radius,
+            ball_right_y_limit = ballObject.position.y + ball_radius;
 
         if(object_left_y_limit < ball_left_y_limit || object_left_y_limit < ball_right_y_limit){
             collision = true;
@@ -251,8 +252,8 @@ console.clear();
         // z coordinate collision
         var object_left_z_limit = object.position.z - object_dims.z / 2,
             object_right_z_limit = object.position.z + object_dims.z / 2,
-            ball_left_z_limit = ball.position.z - ball_radius,
-            ball_right_z_limit = ball.position.z + ball_radius;
+            ball_left_z_limit = ballObject.position.z - ball_radius,
+            ball_right_z_limit = ballObject.position.z + ball_radius;
 
         if(object_left_z_limit < ball_left_z_limit || object_left_z_limit < ball_right_z_limit){
             collision = true;
@@ -338,6 +339,15 @@ console.clear();
                         loosePower(1);
                     }
                     break;
+                case "baskIceBall":
+                    if(freezeBall.status === "inactive"){
+                        freezeBall.player = 1;
+                        freezeBall.status = "active";
+                        freezeBall.instance = createFreezeBall(1);
+                        freezeBall.status = "moving";
+                        loosePower(1);
+                    }
+                    break;
             }
         }
 
@@ -355,16 +365,33 @@ console.clear();
                         loosePower(2);
                     }
                     break;
+                case "baskIceBall":
+                    if(freezeBall.status === "inactive"){
+                        freezeBall.player = 2;
+                        freezeBall.status = "active";
+                        freezeBall.instance = createFreezeBall(2);
+                        freezeBall.status = "moving";
+                        loosePower(2);
+                    }
+                    break;
             }
         }
 
         // CHEATS
-        if(Key.isDown(97)){
+        if(Key.isDown(49)){
             gainPower("farLimiter", 1);
         }
 
-        if(Key.isDown(98)){
+        if(Key.isDown(50)){
             gainPower("jump", 1);
+        }
+
+        if(Key.isDown(51)){
+            gainPower("baskIceBall", 1);
+        }
+
+        if(Key.isDown(52)){
+            activateTripWall();
         }
 
         // primaryCamera tracking
@@ -414,7 +441,6 @@ console.clear();
                 else{
                     reducePlayerFar(farItem.player);
                 }
-
             }
 
             if(trapWall.status === "active"){
@@ -462,18 +488,66 @@ console.clear();
             processCpuPaddle();
             paddleControl();
 
+            if(freezeBall.status === "freeze"){
+                if(freezeBall.timestamp + 10000 < Date.now()){
+                    unfreezePlayer(freezeBall.freeze);
+                }
+
+                if(freezeBall.freeze === 1){
+                    paddle1.position.x = freezeBall.pos;
+                }
+                else if(freezeBall.freeze === 2){
+                    paddle2.position.x = freezeBall.pos;
+                }
+            }
+
+            if(freezeBall.status === "moving"){
+                console.log(freezeBall.instance.position.z);
+                if(freezeBall.instance.position.z >= 1500 || freezeBall.instance.position.z <= -1500){
+                    unfreezePlayer(0);
+                    destroyFreezeBall();
+                }
+                else if(ballObjectCollision(freezeBall.instance,paddle2,freezeBall.radius,player_2_paddle.dimension) ||
+                    ballObjectCollision(freezeBall.instance,paddle1,freezeBall.radius,player_1_paddle.dimension)){
+                    freezeBall.status = "freeze";
+
+                    if(freezeBall.player === 1){
+                        freezeBall.freeze = 2;
+                        paddle2.material.color.setHex(freezeBall.color);
+                        freezeBall.pos = paddle2.position.x;
+                    }
+                    else if(freezeBall.player === 2){
+                        freezeBall.freeze = 1;
+                        paddle1.material.color.setHex(freezeBall.color);
+                        freezeBall.pos = paddle1.position.x;
+                    }
+
+                    freezeBall.timestamp = Date.now();
+
+                    destroyFreezeBall();
+                }
+                else{
+                    moveFreezeBall(freezeBall.player);
+                }
+
+            }
+
             if(fieldItem.timestamp + 5000 + Math.floor((Math.random() * 1000) + 1) < Date.now()){
                 if(fieldItem.instance === ""){
                     fieldItem.timestamp = Date.now();
 
                     var randomItem = Math.floor((Math.random() * 50) + 1);
 
-                    if(randomItem < 5){
+                    if(randomItem < 10){
                         fieldItem.name = "jump";
                         fieldItem.instance = generateRandomItem();
                     }
-                    else if(randomItem < 50){
+                    else if(randomItem < 20){
                         fieldItem.name = "farLimiter";
+                        fieldItem.instance = generateRandomItem();
+                    }
+                    else if(randomItem < 30){
+                        fieldItem.name = "baskIceBall";
                         fieldItem.instance = generateRandomItem();
                     }
                     else{
@@ -485,7 +559,29 @@ console.clear();
         }
     }
 
+    function unfreezePlayer(player){
+        freezeBall.status = "inactive";
+        freezeBall.player = 0;
+        freezeBall.pos = 0;
+
+        if(player === 1){
+            paddle1.material.color.setHex(player_1_paddle.color);
+        }
+        else if(player === 2){
+            paddle2.material.color.setHex(player_2_paddle.color);
+        }
+    }
+
+    function destroyFreezeBall(){
+        scene.remove(freezeBall.instance);
+        freezeBall.instance = "";
+    }
+
     function activateTripWall(){
+        // remove old walls from scene
+        scene.remove(trapWall.left);
+        scene.remove(trapWall.right);
+
         // generate trapWall objects
         trapWall.left = generateTrapWall(-trapWall.width);
         trapWall.right = generateTrapWall(trapWall.width);
@@ -554,6 +650,38 @@ console.clear();
         else if(player === 2){
             primaryCamera.far = primaryCamera.far - 10;
             farItem.far = primaryCamera.far;
+        }
+    }
+
+    function createFreezeBall(player){
+        var freezeBallInstance = new THREE.SphereGeometry(freezeBall.radius, 5, 5),
+            freezeBallMaterial = new THREE.MeshLambertMaterial({
+                color: freezeBall.color
+            }),
+        baskIceBall = new THREE.Mesh(freezeBallInstance, freezeBallMaterial);
+        scene.add(baskIceBall);
+
+        if(player === 1){
+            baskIceBall.position.x = paddle1.position.x;
+            baskIceBall.position.z = paddle1.position.z-50;
+            baskIceBall.position.y = paddle1.position.y;
+        }
+        else if(player === 2){
+            baskIceBall.position.x = paddle2.position.x;
+            baskIceBall.position.z = paddle2.position.z+50;
+            baskIceBall.position.y = paddle2.position.y;
+        }
+
+        return baskIceBall;
+    }
+
+    function moveFreezeBall(player){
+        var baskIceBall = freezeBall.instance;
+        if(player === 1){
+            baskIceBall.position.z -= 1;
+        }
+        else if(player === 2){
+            baskIceBall.position.z += 1;
         }
     }
 
