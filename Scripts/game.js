@@ -7,7 +7,7 @@ console.clear();
         VIEW_ANGLE = 45,
         ASPECT = WIDTH / HEIGHT,
         NEAR = 0.1,
-        FAR = 10000,
+        FAR = 15000,
         FIELD_WIDTH = 1200,
         FIELD_LENGTH = 3000,
         BALL_RADIUS = 20,
@@ -35,7 +35,8 @@ console.clear();
         player1Item = "none",
         player2Item = "none",
         fieldItem = {name: "", instance: "", dimension: {x: 50, y: 50, z: 50}},
-        itemDirection = 1;
+        itemDirection = 1,
+        backgroundSphere;
 
 
     function startBallMovement() {
@@ -496,7 +497,7 @@ console.clear();
         scene.add(camera);
 
         var fieldGeometry = new THREE.CubeGeometry(FIELD_WIDTH, 5, FIELD_LENGTH, 1, 1, 1),
-        textureImage = THREE.ImageUtils.loadTexture('https://upload.wikimedia.org/wikipedia/commons/8/8c/Football_field.jpg');
+        textureImage = THREE.ImageUtils.loadTexture('images/football-field.jpg');
         var fieldMaterial = new THREE.MeshPhongMaterial({map: textureImage});
             /*fieldMaterial = new THREE.MeshLambertMaterial({
                 color: 0x0033FF
@@ -504,6 +505,7 @@ console.clear();
         field = new THREE.Mesh(fieldGeometry, fieldMaterial);
         field.position.set(0, -50, 0);
 
+        // set paddles
         scene.add(field);
         paddle1 = addPaddle(PADDLE1DIMS,0xAA3333);
         paddle1.position.z = FIELD_LENGTH / 2;
@@ -516,6 +518,7 @@ console.clear();
         fieldItem.name = "jump";
         fieldItem.instance = generateRandomItem();
 
+        // set ball
         var ballGeometry = new THREE.SphereGeometry(BALL_RADIUS, 16, 16),
             ballMaterial = new THREE.MeshLambertMaterial({
                 color: 0x0FF0FF
@@ -526,11 +529,23 @@ console.clear();
         camera.lookAt(ball.position);
         topCamera.lookAt(ball.position);
 
+        // set light
         mainLight = new THREE.HemisphereLight(0xFFFFFF, 0x003300);
         scene.add(mainLight);
 
-        camera.lookAt(ball.position);
-        topCamera.lookAt(ball.position);
+        // set background
+        var backgroundTexture = THREE.ImageUtils.loadTexture("images/background-universe.jpg");
+        backgroundTexture.minFilter = THREE.LinearFilter;
+
+        backgroundSphere = new THREE.Mesh(
+          new THREE.SphereGeometry(FAR - 2500, 20, 20),
+          new THREE.MeshBasicMaterial({
+              map: backgroundTexture
+          })
+        );
+
+        backgroundSphere.scale.x = -1;
+        scene.add(backgroundSphere);
 
         updateScoreBoard();
         startRender();
