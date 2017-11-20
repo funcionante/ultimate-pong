@@ -31,10 +31,10 @@ console.clear();
         },
         PADDLE1DIMS = {z: 10, y: 30, x: 200},
         PADDLE2DIMS = {z: 10, y: 30, x: 200},
-        trapWall = {startDim: {x: 50, y: 10, z: 50}, dimension: {x: 0, y: 0, z: 50}},
+        trapWall = {startDim: {x: 50, y: 10, z: 50}, dimension: {x: 0, y: 0, z: 50}, timestamp: 0, status: "inactive"},
         player1Item = "none",
         player2Item = "none",
-        fieldItem = {name: "", instance: "", dimension: {x: 50, y: 50, z: 50}},
+        fieldItem = {name: "", instance: "", dimension: {x: 50, y: 50, z: 50}, timestamp: Date.now()},
         itemDirection = 1,
         backgroundSphere;
 
@@ -110,14 +110,16 @@ console.clear();
 
             // if hit the item, gain power
             if (ballObjectCollision(ball,fieldItem.instance,BALL_RADIUS,fieldItem.dimension)){
-                console.log("item");
-                if(ball.$velocity.z < 0){
-                    console.log("Player 1 power!");
-                    gainPower(fieldItem.name,1);
+                if(fieldItem.name === "trapWall"){
+                    activateTripWall();
                 }
                 else{
-                    console.log("Player 2 power!");
-                    gainPower(fieldItem.name,2);
+                    if(ball.$velocity.z < 0){
+                        gainPower(fieldItem.name,1);
+                    }
+                    else{
+                        gainPower(fieldItem.name,2);
+                    }
                 }
 
                 scene.remove(fieldItem.instance);
@@ -291,7 +293,7 @@ console.clear();
 
     function addPoint(playerName) {
         score[playerName]++;
-        console.log(score);
+        trapWall.status = "closing";
     }
 
     function startRender() {
@@ -377,20 +379,83 @@ console.clear();
 
             requestAnimationFrame(render);
 
-            if(trapWall.left.position.z <= 950 && trapWall.left.position.z >= -950){
-                wallMove();
+            if(trapWall.status === "active"){
+                if(trapWall.left.position.x < -325 && trapWall.right.position.x > 325){
+                    wallBuild();
+                }
+                else{
+                    trapWall.status = "moving";
+                }
             }
-            else{
-                wallRemove();
+            else if(trapWall.timestamp + 50000 < Date.now()){
+                if(trapWall.left.position.y > -75){
+                    wallRemove();
+                }
+                else{
+                    trapWall.status = "inactive";
+                }
+            }
+            else if(trapWall.status === "moving"){
+                // wall advances on target
+                if(trapWall.left.position.z <= 950 && trapWall.left.position.z >= -950){
+                    if(ball.position.z > trapWall.left.position.z){
+                        trapWall.left.position.z += 1;
+                        trapWall.right.position.z += 1;
+                    }
+                    else{
+                        trapWall.left.position.z -= 1;
+                        trapWall.right.position.z -= 1;
+                    }
+                }
+                else{
+                    trapWall.status = "closing";
+                }
+            }
+            else if(trapWall.status === "closing"){
+                if(trapWall.left.position.y > -75){
+                    wallRemove();
+                }
+                else{
+                    trapWall.status = "inactive";
+                }
             }
 
             processBallMovement();
             processCpuPaddle();
             paddleControl();
+
+            if(fieldItem.timestamp + 5000 + Math.floor((Math.random() * 1000) + 1) < Date.now()){
+                if(fieldItem.instance === ""){
+                    fieldItem.timestamp = Date.now();
+
+                    var randomItem = Math.floor((Math.random() * 50) + 1);
+
+                    if(randomItem < 40){
+                        fieldItem.name = "jump";
+                        fieldItem.instance = generateRandomItem();
+                    }
+                    else{
+                        fieldItem.name = "trapWall";
+                        fieldItem.instance = generateRandomItem();
+                    }
+
+                }
+
+            }
+
         }
     }
 
-    function wallMove(){
+    function activateTripWall(){
+        // generate trapWall objects
+        trapWall.left = generateTrapWall(-575);
+        trapWall.right = generateTrapWall(575);
+
+        trapWall.status = "active";
+        trapWall.timestamp = Date.now();
+    }
+
+    function wallBuild(){
         // wall gaining height
         if(trapWall.left.position.y < 100){
             trapWall.left.scale.y += 0.1;
@@ -412,12 +477,6 @@ console.clear();
                 trapWall.right.position.x -= 0.75;
 
                 trapWall.dimension.x += trapWall.startDim.x * 0.03;
-            }
-
-            // wall advances on target
-            if(trapWall.left.position.x >= -325 && trapWall.right.position.x <= 325){
-                trapWall.left.position.z += 1;
-                trapWall.right.position.z += 1;
             }
         }
     }
@@ -455,8 +514,9 @@ console.clear();
 
     function generateRandomItem(){
         item = addItem();
-        item.position.z = 0;
-        item.position.x = 0;
+
+        item.position.z = -1000 + Math.floor((Math.random() * 2000) + 1);
+        item.position.x = -500 + Math.floor((Math.random() * 1000) + 1);
         return item;
     }
 
@@ -512,11 +572,9 @@ console.clear();
         paddle2 = addPaddle(PADDLE2DIMS,0x3F51B5);
         paddle2.position.z = -FIELD_LENGTH / 2;
 
+        // generate trapWall objects
         trapWall.left = generateTrapWall(-575);
         trapWall.right = generateTrapWall(575);
-
-        fieldItem.name = "jump";
-        fieldItem.instance = generateRandomItem();
 
         // set ball
         var ballGeometry = new THREE.SphereGeometry(BALL_RADIUS, 16, 16),
