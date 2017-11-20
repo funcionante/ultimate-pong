@@ -35,6 +35,7 @@ console.clear();
         player1Item = "none",
         player2Item = "none",
         fieldItem = {name: "", instance: "", dimension: {x: 50, y: 50, z: 50}, timestamp: Date.now()},
+        farItem = {status: "inactive", player: 0},
         itemDirection = 1,
         backgroundSphere;
 
@@ -143,11 +144,11 @@ console.clear();
     function gainPower(itemName, playerNumber){
         if(playerNumber === 1){
             player1Item = itemName;
-            player_1_power.innerHTML ='<img src="https://image.freepik.com/free-icon/feet-kicking-a-soccer-ball_318-27303.jpg" height="40px" width="40px">';
+            player_1_power.innerHTML ='<img src="https://atnog.av.it.pt/~bartashevich/vi/'+itemName+'.jpg" height="40px" width="40px">';
         }
         else if(playerNumber === 2){
             player2Item = itemName;
-            player_2_power.innerHTML ='<img src="https://image.freepik.com/free-icon/feet-kicking-a-soccer-ball_318-27303.jpg" height="40px" width="40px">';
+            player_2_power.innerHTML ='<img src="https://atnog.av.it.pt/~bartashevich/vi/'+itemName+'.jpg" height="40px" width="40px">';
         }
     }
 
@@ -330,6 +331,14 @@ console.clear();
                 case "jump":
                     ballJump(ball);
                     loosePower(1);
+                    break;
+                case "farLimiter":
+                    if(farItem.status === "inactive"){
+                        farItem.player = 1;
+                        farItem.status = "active";
+                        loosePower(1);
+                    }
+                    break;
             }
         }
 
@@ -339,7 +348,24 @@ console.clear();
                 case "jump":
                     ballJump(ball);
                     loosePower(2);
+                    break;
+                case "farLimiter":
+                    if(farItem.status === "inactive"){
+                        farItem.player = 2;
+                        farItem.status = "active";
+                        loosePower(2);
+                    }
+                    break;
             }
+        }
+
+        // CHEATS
+        if(Key.isDown(97)){
+            gainPower("farLimiter", 1);
+        }
+
+        if(Key.isDown(98)){
+            gainPower("jump", 1);
         }
 
         // camera tracking
@@ -378,6 +404,19 @@ console.clear();
         if (running) {
 
             requestAnimationFrame(render);
+
+            if(farItem.status === "active"){
+                if(farItem.far <= 500){
+                    farItem.status = "inactive";
+                    farItem.far = FAR;
+                    camera.far = FAR;
+                    topCamera.far = FAR;
+                }
+                else{
+                    reducePlayerFar(farItem.player);
+                }
+
+            }
 
             if(trapWall.status === "active"){
                 if(trapWall.left.position.x < -325 && trapWall.right.position.x > 325){
@@ -430,8 +469,12 @@ console.clear();
 
                     var randomItem = Math.floor((Math.random() * 50) + 1);
 
-                    if(randomItem < 40){
+                    if(randomItem < 5){
                         fieldItem.name = "jump";
+                        fieldItem.instance = generateRandomItem();
+                    }
+                    else if(randomItem < 50){
+                        fieldItem.name = "farLimiter";
                         fieldItem.instance = generateRandomItem();
                     }
                     else{
@@ -504,6 +547,17 @@ console.clear();
 
                 trapWall.dimension.y -= trapWall.startDim.y * 0.1;
             }
+        }
+    }
+
+    function reducePlayerFar(player){
+        if(player === 1){
+            topCamera.far = topCamera.far - 10;
+            farItem.far = topCamera.far;
+        }
+        else if(player === 2){
+            camera.far = camera.far - 10;
+            farItem.far = camera.far;
         }
     }
 
