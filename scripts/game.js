@@ -14,7 +14,6 @@ console.clear();
         BALL_JUMP_POSITION = 0,
 
         //get the scoreboard element.
-        //scoreBoard = document.getElementById('scoreBoard'),
         player_1_score = document.getElementById('player_1_score'),
         player_2_score = document.getElementById('player_2_score'),
 
@@ -23,15 +22,15 @@ console.clear();
         player_2_power = document.getElementById('player_2_power'),
 
         //declare members.
-        container, renderer, camera, mainLight, topCamera,
+        container, renderer, primaryCamera, mainLight, secondCamera,
         scene, ball, paddle1, paddle2, field, running,
         score = {
             player1: 0,
             player2: 0
         },
-        PADDLE1DIMS = {z: 10, y: 30, x: 200},
-        PADDLE2DIMS = {z: 10, y: 30, x: 200},
-        trapWall = {startDim: {x: 50, y: 10, z: 50}, dimension: {x: 0, y: 0, z: 50}, timestamp: 0, status: "inactive"},
+        player_1_paddle = {dimension: {z: 10, y: 30, x: 200}, color: 0xAA3333},
+        player_2_paddle = {dimension: {z: 10, y: 30, x: 200}, color: 0x3F51B5},
+        trapWall = {color: 0xFF0000, width: 575, startDim: {x: 50, y: 10, z: 50}, dimension: {x: 0, y: 0, z: 50}, timestamp: 0, status: "inactive"},
         player1Item = "none",
         player2Item = "none",
         fieldItem = {name: "", instance: "", dimension: {x: 50, y: 50, z: 50}, timestamp: Date.now()},
@@ -77,7 +76,7 @@ console.clear();
         }
 
         // IF HIT PADDLE 1
-        if (ballObjectCollision(ball,paddle1,BALL_RADIUS,PADDLE1DIMS)){
+        if (ballObjectCollision(ball,paddle1,BALL_RADIUS,player_1_paddle.dimension)){
             hitBallBack(paddle1);
         }
 
@@ -92,7 +91,7 @@ console.clear();
         }
 
         // IF HIT PADDLE 2
-        if (ballObjectCollision(ball,paddle2,BALL_RADIUS,PADDLE2DIMS)){
+        if (ballObjectCollision(ball,paddle2,BALL_RADIUS,player_2_paddle.dimension)){
             hitBallBack(paddle2);
         }
 
@@ -144,22 +143,22 @@ console.clear();
     function gainPower(itemName, playerNumber){
         if(playerNumber === 1){
             player1Item = itemName;
-            player_1_power.innerHTML ='<img src="https://atnog.av.it.pt/~bartashevich/vi/'+itemName+'.jpg" height="40px" width="40px">';
+            player_1_power.innerHTML ='<img src="images/items/'+itemName+'.jpg" height="40px" width="40px">';
         }
         else if(playerNumber === 2){
             player2Item = itemName;
-            player_2_power.innerHTML ='<img src="https://atnog.av.it.pt/~bartashevich/vi/'+itemName+'.jpg" height="40px" width="40px">';
+            player_2_power.innerHTML ='<img src="images/items/'+itemName+'.jpg" height="40px" width="40px">';
         }
     }
 
     function loosePower(playerNumber){
         if(playerNumber === 1){
             player1Item = "none";
-            player_1_power.innerHTML ='<img src="https://i.ytimg.com/vi/J3pF2jkQ4vc/maxresdefault.jpg" height="40px" width="40px">';
+            player_1_power.innerHTML ='<img src="images/items/none.jpg" height="40px" width="40px">';
         }
         else if(playerNumber === 2){
             player2Item = "none";
-            player_2_power.innerHTML ='<img src="https://i.ytimg.com/vi/J3pF2jkQ4vc/maxresdefault.jpg" height="40px" width="40px">';
+            player_2_power.innerHTML ='<img src="images/items/none.jpg" height="40px" width="40px">';
         }
     }
 
@@ -368,9 +367,9 @@ console.clear();
             gainPower("jump", 1);
         }
 
-        // camera tracking
-        topCamera.position.x = paddle2.position.x;
-        camera.position.x = paddle1.position.x;
+        // primaryCamera tracking
+        secondCamera.position.x = paddle2.position.x;
+        primaryCamera.position.x = paddle1.position.x;
     }
 
     function render() {
@@ -386,9 +385,9 @@ console.clear();
         renderer.setViewport(left, bottom, width, height);
         renderer.setScissor(left, bottom, width, height);
         renderer.enableScissorTest(true);
-        topCamera.aspect = width / height;
-        topCamera.updateProjectionMatrix();
-        renderer.render(scene, topCamera);
+        secondCamera.aspect = width / height;
+        secondCamera.updateProjectionMatrix();
+        renderer.render(scene, secondCamera);
 
         left = 1;
         bottom = 0.5 * SCREEN_H + 1;
@@ -397,9 +396,9 @@ console.clear();
         renderer.setViewport(left, bottom, width, height);
         renderer.setScissor(left, bottom, width, height);
         renderer.enableScissorTest(true); // clip out "viewport"
-        camera.aspect = width / height;
-        camera.updateProjectionMatrix();
-        renderer.render(scene, camera);
+        primaryCamera.aspect = width / height;
+        primaryCamera.updateProjectionMatrix();
+        renderer.render(scene, primaryCamera);
 
         if (running) {
 
@@ -409,8 +408,8 @@ console.clear();
                 if(farItem.far <= 500){
                     farItem.status = "inactive";
                     farItem.far = FAR;
-                    camera.far = FAR;
-                    topCamera.far = FAR;
+                    primaryCamera.far = FAR;
+                    secondCamera.far = FAR;
                 }
                 else{
                     reducePlayerFar(farItem.player);
@@ -481,18 +480,15 @@ console.clear();
                         fieldItem.name = "trapWall";
                         fieldItem.instance = generateRandomItem();
                     }
-
                 }
-
             }
-
         }
     }
 
     function activateTripWall(){
         // generate trapWall objects
-        trapWall.left = generateTrapWall(-575);
-        trapWall.right = generateTrapWall(575);
+        trapWall.left = generateTrapWall(-trapWall.width);
+        trapWall.right = generateTrapWall(trapWall.width);
 
         trapWall.status = "active";
         trapWall.timestamp = Date.now();
@@ -552,12 +548,12 @@ console.clear();
 
     function reducePlayerFar(player){
         if(player === 1){
-            topCamera.far = topCamera.far - 10;
-            farItem.far = topCamera.far;
+            secondCamera.far = secondCamera.far - 10;
+            farItem.far = secondCamera.far;
         }
         else if(player === 2){
-            camera.far = camera.far - 10;
-            farItem.far = camera.far;
+            primaryCamera.far = primaryCamera.far - 10;
+            farItem.far = primaryCamera.far;
         }
     }
 
@@ -577,7 +573,7 @@ console.clear();
     function generateTrapWall(pos){
         var itemGeometry = new THREE.CubeGeometry(trapWall.startDim.x, trapWall.startDim.y, trapWall.startDim.z, 1, 1, 1),
             itemMaterial = new THREE.MeshLambertMaterial({
-                color: 0xFF0000
+                color: trapWall.color
             }),
             wall = new THREE.Mesh(itemGeometry, itemMaterial);
 
@@ -601,34 +597,31 @@ console.clear();
         renderer.setClearColor(0x000000, 1);
         container.appendChild(renderer.domElement);
 
-        camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
-        camera.position.set(0, 200, FIELD_LENGTH / 2 + 500);
+        primaryCamera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
+        primaryCamera.position.set(0, 200, FIELD_LENGTH / 2 + 500);
 
-        topCamera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
-        topCamera.position.set(0, 200, -(FIELD_LENGTH / 2 + 500));
+        secondCamera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
+        secondCamera.position.set(0, 200, -(FIELD_LENGTH / 2 + 500));
 
         scene = new THREE.Scene();
-        scene.add(camera);
+        scene.add(primaryCamera);
 
         var fieldGeometry = new THREE.CubeGeometry(FIELD_WIDTH, 5, FIELD_LENGTH, 1, 1, 1),
         textureImage = THREE.ImageUtils.loadTexture('images/football-field.jpg');
         var fieldMaterial = new THREE.MeshPhongMaterial({map: textureImage});
-            /*fieldMaterial = new THREE.MeshLambertMaterial({
-                color: 0x0033FF
-            });*/
         field = new THREE.Mesh(fieldGeometry, fieldMaterial);
         field.position.set(0, -50, 0);
 
         // set paddles
         scene.add(field);
-        paddle1 = addPaddle(PADDLE1DIMS,0xAA3333);
+        paddle1 = addPaddle(player_1_paddle.dimension,player_1_paddle.color);
         paddle1.position.z = FIELD_LENGTH / 2;
-        paddle2 = addPaddle(PADDLE2DIMS,0x3F51B5);
+        paddle2 = addPaddle(player_2_paddle.dimension,player_2_paddle.color);
         paddle2.position.z = -FIELD_LENGTH / 2;
 
         // generate trapWall objects
-        trapWall.left = generateTrapWall(-575);
-        trapWall.right = generateTrapWall(575);
+        trapWall.left = generateTrapWall(-trapWall.width);
+        trapWall.right = generateTrapWall(trapWall.width);
 
         // set ball
         var ballGeometry = new THREE.SphereGeometry(BALL_RADIUS, 16, 16),
@@ -638,8 +631,8 @@ console.clear();
         ball = new THREE.Mesh(ballGeometry, ballMaterial);
         scene.add(ball);
 
-        camera.lookAt(ball.position);
-        topCamera.lookAt(ball.position);
+        primaryCamera.lookAt(ball.position);
+        secondCamera.lookAt(ball.position);
 
         // set light
         mainLight = new THREE.HemisphereLight(0xFFFFFF, 0x003300);
@@ -662,7 +655,6 @@ console.clear();
         updateScoreBoard();
         startRender();
 
-        //renderer.domElement.addEventListener('mousemove', containerMouseMove);
         renderer.domElement.style.cursor = 'none';
     }
 
@@ -678,7 +670,7 @@ console.clear();
     }
 
     function addItem(){
-        var itemGeometry = new THREE.CubeGeometry(50, 50, 50, 1, 1, 1),
+        var itemGeometry = new THREE.CubeGeometry(fieldItem.dimension.x, fieldItem.dimension.y, fieldItem.dimension.z, 1, 1, 1),
             itemMaterial = new THREE.MeshLambertMaterial({
                 color: 0xFF0000
             }),
@@ -690,8 +682,8 @@ console.clear();
 
     /*function containerMouseMove(e) {
         var mouseX = e.clientX;
-        camera.position.x = paddle1.position.x = -((WIDTH - mouseX) / WIDTH * FIELD_WIDTH) + (FIELD_WIDTH / 2);
-        topCamera.position.x = paddle2.position.x;
+        primaryCamera.position.x = paddle1.position.x = -((WIDTH - mouseX) / WIDTH * FIELD_WIDTH) + (FIELD_WIDTH / 2);
+        secondCamera.position.x = paddle2.position.x;
     }*/
 
     init();
