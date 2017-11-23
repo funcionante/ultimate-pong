@@ -2,8 +2,8 @@ console.clear();
 
 (function(window, document, THREE) {
     // "constants"...
-    var WIDTH = window.innerWidth-50,
-        HEIGHT = window.innerHeight - 50,
+    var WIDTH = window.innerWidth,
+        HEIGHT = window.innerHeight,
         VIEW_ANGLE = 45,
         ASPECT = WIDTH / HEIGHT,
         NEAR = 0.1,
