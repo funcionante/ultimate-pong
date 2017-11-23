@@ -78,12 +78,23 @@
   <body scroll="no" style="overflow: hidden">
     <div id="container" style="position:absolute"></div>
     <div style="position: absolute; height:100%;width: 100%">
+        <!-- Menu -->
+        <div id="menu" style="position:absolute;width: 40%;height: 40%;background-color: white; top:20%; left: 30%">
+            <div style="width: 100%; height: 50%;">
+                <button style="width: 47%; height: 97%; margin: 1%">SINGLE-PLAYER</button>
+                <button style="width: 47%; height: 97%; margin: 1%">TWO-PLAYER</button>
+            </div>
+            <div style="margin: 1%;width: 98%; height: 47%;">
+                <button style="width: 100%; height: 100%">TWO-PLAYER</button>
+            </div>
+        </div>
+        <!-- Content -->
         <div style="position: relative; height: 50%">
             <div id="player_1_power" class="player_power" style="left: 5px; top: 5px;">
                 <img src="https://i.ytimg.com/vi/J3pF2jkQ4vc/maxresdefault.jpg" height="40px" width="40px">
             </div>
             <div id="player_1_score" class="player_score player_1_score" style="right: 5px; top: 5px;position:relative;float: right;">
-                10
+                0
             </div>
         </div>
         <div style="position: relative; height: 50%">
@@ -91,7 +102,7 @@
                 <img src="https://i.ytimg.com/vi/J3pF2jkQ4vc/maxresdefault.jpg" height="40px" width="40px">
             </div>
             <div id="player_2_score" class="player_score player_2_score" style="right: 5px; top: 5px;position:relative;float: right;">
-                10
+                0
             </div>
         </div>
     </div>
