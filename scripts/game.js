@@ -677,11 +677,12 @@ console.clear();
 
     function moveFreezeBall(player){
         var baskIceBall = freezeBall.instance;
+        console.log(baskIceBall.position.z);
         if(player === 1){
-            baskIceBall.position.z -= 1;
+            baskIceBall.position.z -= 98;
         }
         else if(player === 2){
-            baskIceBall.position.z += 1;
+            baskIceBall.position.z += 98;
         }
     }
 
