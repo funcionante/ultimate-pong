@@ -28,8 +28,8 @@ console.clear();
             player1: 0,
             player2: 0
         },
-        player_1_paddle = {dimension: {z: 10, y: 30, x: 200}, color: 0xAA3333},
-        player_2_paddle = {dimension: {z: 10, y: 30, x: 200}, color: 0x3F51B5},
+        player_1_paddle = {dimension: {z: 10, y: 30, x: 200}, color: 0xAA3333, autopilot: false},
+        player_2_paddle = {dimension: {z: 10, y: 30, x: 200}, color: 0x3F51B5, autopilot: false},
         trapWall = {color: 0xFF0000, width: 575, startDim: {x: 50, y: 10, z: 50}, dimension: {x: 0, y: 0, z: 50}, timestamp: 0, status: "inactive"},
         player1Item = "none",
         player2Item = "none",
@@ -37,6 +37,7 @@ console.clear();
         farItem = {status: "inactive", player: 0},
         freezeBall = {instance: "", status: "inactive", color: 0xB4CFFA, player: 0, radius: 10, pos: 0, freeze: 0},
         fieldRotation = {player: 0, status: "inactive"},
+        ballControl = {player: 0, status: "inactive", timestamp: 0},
         itemDirection = 1,
         backgroundSphere;
 
@@ -56,21 +57,23 @@ console.clear();
     }
 
     function executeRotation(){
-        var cam;
-
         if(fieldRotation.status === "active"){
             if(fieldRotation.player === 1){
-                cam = secondCamera;
+                if(secondCamera.rotation.z <= 5 * Math.PI){
+                    secondCamera.rotation.z += 0.1;
+                    if(secondCamera.rotation.z > 5 * Math.PI){
+                        secondCamera.rotation.z = Math.PI;
+                        fieldRotation.status = "inactive";
+                    }
+                }
             }
             else if(fieldRotation.player === 2){
-                cam = primaryCamera;
-            }
-
-            if(cam.rotation.z <= 5*Math.PI){
-                cam.rotation.z += 0.1;
-                if(cam.rotation.z > 5*Math.PI){
-                    cam.rotation.z = Math.PI;
-                    fieldRotation.status = "inactive";
+                if(primaryCamera.rotation.z <= 4 * Math.PI){
+                    primaryCamera.rotation.z += 0.1;
+                    if(primaryCamera.rotation.z > 4 * Math.PI){
+                        primaryCamera.rotation.z = 0;
+                        fieldRotation.status = "inactive";
+                    }
                 }
             }
         }
@@ -335,21 +338,45 @@ console.clear();
 
     function paddleControl(){
         // player 1 go left
-        if(Key.isDown(65) && paddle1.position.x > -500){
-            paddle1.position.x -= 10;
+        if(Key.isDown(65)){
+            if(ballControl.status === "active" && ballControl.player === 1){
+                ballHijack(-1);
+            }
+            else if (paddle1.position.x > -500){
+                paddle1.position.x -= 10;
+            }
+
         }
         // player 1 go right
-        if(Key.isDown(68) && paddle1.position.x < 500){
-            paddle1.position.x += 10;
+        if(Key.isDown(68)){
+            if(ballControl.status === "active" && ballControl.player === 1){
+                ballHijack(+1);
+            }
+            else if(paddle1.position.x < 500){
+                paddle1.position.x += 10;
+            }
         }
 
         // player 2 go left
-        if(Key.isDown(37) && paddle2.position.x < 500){
-            paddle2.position.x += 10;
+        if(Key.isDown(37)){
+            if(ballControl.status === "active" && ballControl.player === 2){
+                ballHijack(+1);
+                paddle2.position.x = ball.position.x;
+            }
+            else if (paddle2.position.x < 500){
+                paddle2.position.x += 10;
+            }
         }
         // player 2 go right
-        if(Key.isDown(39) && paddle2.position.x > -500){
-            paddle2.position.x -= 10;
+        if(Key.isDown(39)){
+            if(ballControl.status === "active" && ballControl.player === 2){
+                ballHijack(-1);
+                paddleAutopilot(1);
+                paddle2.position.x = ball.position.x;
+            }
+            else if (paddle2.position.x > -500){
+                paddle2.position.x -= 10;
+            }
         }
 
         // player 1 special power
@@ -378,6 +405,15 @@ console.clear();
                 case "rotation":
                     if(fieldRotation.status === "inactive"){
                         activateRotation(1);
+                        loosePower(1);
+                    }
+                    break;
+                case "ballControl":
+                    if(ballControl.status === "inactive"){
+                        ballControl.player = 1;
+                        ballControl.status = "active";
+                        ballControl.timestamp = Date.now();
+                        player_1_paddle.autopilot = true;
                         loosePower(1);
                     }
                     break;
@@ -413,6 +449,15 @@ console.clear();
                         loosePower(2);
                     }
                     break;
+                case "ballControl":
+                    if(ballControl.status === "inactive"){
+                        ballControl.player = 2;
+                        ballControl.status = "active";
+                        ballControl.timestamp = Date.now();
+                        player_2_paddle.autopilot = true;
+                        loosePower(2);
+                    }
+                    break;
             }
         }
 
@@ -433,32 +478,104 @@ console.clear();
             gainPower("rotation", 1);
         }
 
-        // CHEATS PLAYER 2
-        if(Key.isDown(48)){
-            gainPower("farLimiter", 2);
+        if(Key.isDown(54)){
+            gainPower("ballControl", 1);
         }
 
-        if(Key.isDown(57)){
-            gainPower("jump", 2);
-        }
-
-        if(Key.isDown(56)){
-            gainPower("baskIceBall", 2);
-        }
-
-        if(Key.isDown(55)){
-            gainPower("rotation", 2);
-        }
 
         // GENERAL CHEATS
 
         if(Key.isDown(52)){
             activateTripWall();
         }
+    }
 
-        // primaryCamera tracking
-        secondCamera.position.x = paddle2.position.x;
-        primaryCamera.position.x = paddle1.position.x;
+    function paddleAutopilot(){
+        if(ballControl.player === 1){
+            paddle1.position.x = ball.position.x;
+        }
+
+        else if(ballControl.player === 2){
+            paddle2.position.x = ball.position.x;
+        }
+    }
+
+    function ballHijack(mov){
+        var velX = ball.$velocity.x;
+        var velZ = ball.$velocity.z;
+
+        // CHANGING DIRECTION ACCORDING TO CIRCULAR MOVEMENT
+        if(velZ > 0 && velX <= 0){
+            velZ -= 1 * mov;
+            velX -= 1 * mov;
+        }
+        else if(velZ <= 0 && velX < 0){
+            velZ -= 1 * mov;
+            velX += 1 * mov;
+        }
+        else if(velZ < 0 && velX >= 0){
+            velZ += 1 * mov;
+            velX += 1 * mov;
+        }
+        else if(velZ >= 0 && velX > 0){
+            velZ += 1 * mov;
+            velX -= 1 * mov;
+        }
+
+        ball.$velocity.x = velX;
+        ball.$velocity.z = velZ;
+    }
+
+    function cameraTracking(){
+        if(ballControl.status === "active"){
+            if(ball.$velocity === null){
+                ballControl.status = "inactive";
+                cameraReset(ballControl.player);
+                ballControl.player = 0;
+                ballControl.timestamp = 0;
+            }
+
+            if(ballControl.player === 1){
+                // ball camera control
+                primaryCamera.position.x = ball.position.x + ball.$velocity.x * 10 * -1;
+                primaryCamera.position.z = ball.position.z + ball.$velocity.z * 10 * -1;
+                primaryCamera.position.y = 50;
+                primaryCamera.lookAt(ball.position);
+
+                // other player default camera
+                secondCamera.position.x = paddle2.position.x;
+            }
+            else if(ballControl.player === 2){
+                // ball camera control
+                secondCamera.position.x = ball.position.x + ball.$velocity.x * 10 * -1;
+                secondCamera.position.z = ball.position.z + ball.$velocity.z * 10 * -1;
+                secondCamera.position.y = 50;
+                secondCamera.lookAt(ball.position);
+
+                // other player default camera
+                primaryCamera.position.x = paddle1.position.x;
+            }
+        }
+        else{
+            secondCamera.position.x = paddle2.position.x;
+            primaryCamera.position.x = paddle1.position.x;
+        }
+
+    }
+
+    function cameraReset(player){
+        if(player === 1){
+            paddle1.position.z = FIELD_LENGTH / 2;
+            paddle1.position.x = 0;
+            primaryCamera.position.set(0, 200, (FIELD_LENGTH / 2 + 500));
+            primaryCamera.lookAt(ball.position);
+        }
+        else if(player === 2){
+            paddle2.position.z = - FIELD_LENGTH / 2;
+            paddle2.position.x = 0;
+            secondCamera.position.set(0, 200, -(FIELD_LENGTH / 2 + 500));
+            secondCamera.lookAt(ball.position);
+        }
     }
 
     function render() {
@@ -493,7 +610,14 @@ console.clear();
 
             requestAnimationFrame(render);
 
+            // camera following paddle
+            cameraTracking();
+
+            // rotation item
             executeRotation();
+
+            // paddle autopilot if needed
+            paddleAutopilot();
 
             if(farItem.status === "active"){
                 if(farItem.far <= 500){
@@ -612,6 +736,10 @@ console.clear();
                     }
                     else if(randomItem < 30){
                         fieldItem.name = "baskIceBall";
+                        fieldItem.instance = generateRandomItem();
+                    }
+                    else if(randomItem < 40){
+                        fieldItem.name = "rotation";
                         fieldItem.instance = generateRandomItem();
                     }
                     else{
