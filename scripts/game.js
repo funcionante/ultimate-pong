@@ -2,8 +2,8 @@ console.clear();
 
 (function(window, document, THREE) {
     // "constants"...
-    var WIDTH = 700,
-        HEIGHT = 500,
+    var WIDTH = window.innerWidth-50,
+        HEIGHT = window.innerHeight - 50,
         VIEW_ANGLE = 45,
         ASPECT = WIDTH / HEIGHT,
         NEAR = 0.1,
@@ -38,9 +38,45 @@ console.clear();
         freezeBall = {instance: "", status: "inactive", color: 0xB4CFFA, player: 0, radius: 10, pos: 0, freeze: 0},
         fieldRotation = {player: 0, status: "inactive"},
         ballControl = {player: 0, status: "inactive", timestamp: 0},
+        paddleIncrease = {player: 0, status: "inactive", timestamp: 0},
         itemDirection = 1,
         backgroundSphere;
 
+    function increasePaddle(player){
+        paddleIncrease.status = "active";
+        paddleIncrease.player = player;
+        paddleIncrease.timestamp = Date.now();
+
+        var inc = 2.5;
+
+        if(player === 1){
+            paddle1.scale.x *= inc;
+            player_1_paddle.dimension.x *= inc;
+        }
+        else if(player === 2) {
+            paddle2.scale.x *= inc;
+            player_2_paddle.dimension.x *= inc;
+        }
+    }
+
+    function decreasePaddle(){
+        if(paddleIncrease.status === "active" && paddleIncrease.timestamp + 15000 < Date.now()){
+            var inc = 2.5;
+
+            if(paddleIncrease.player === 1){
+                paddle1.scale.x /= inc;
+                player_1_paddle.dimension.x /= inc;
+            }
+            else if(paddleIncrease.player === 2){
+                paddle2.scale.x /= inc;
+                player_2_paddle.dimension.x /= inc;
+            }
+
+            paddleIncrease.status = "inactive";
+            paddleIncrease.player = 0;
+            paddleIncrease.timestamp = 0;
+        }
+    }
 
     function startBallMovement() {
         var direction = Math.random() > 0.5 ? -1 : 1;
@@ -360,7 +396,7 @@ console.clear();
         // player 2 go left
         if(Key.isDown(37)){
             if(ballControl.status === "active" && ballControl.player === 2){
-                ballHijack(+1);
+                ballHijack(-1);
                 paddle2.position.x = ball.position.x;
             }
             else if (paddle2.position.x < 500){
@@ -370,7 +406,7 @@ console.clear();
         // player 2 go right
         if(Key.isDown(39)){
             if(ballControl.status === "active" && ballControl.player === 2){
-                ballHijack(-1);
+                ballHijack(+1);
                 paddleAutopilot(1);
                 paddle2.position.x = ball.position.x;
             }
@@ -417,6 +453,12 @@ console.clear();
                         loosePower(1);
                     }
                     break;
+                case "paddleIncrease":
+                    if(paddleIncrease.status === "inactive") {
+                        increasePaddle(1);
+                        loosePower(1);
+                    }
+                    break;
             }
         }
 
@@ -458,6 +500,12 @@ console.clear();
                         loosePower(2);
                     }
                     break;
+                case "paddleIncrease":
+                    if(paddleIncrease.status === "inactive") {
+                        increasePaddle(2);
+                        loosePower(2);
+                    }
+                    break;
             }
         }
 
@@ -474,18 +522,22 @@ console.clear();
             gainPower("baskIceBall", 1);
         }
 
-        if(Key.isDown(53)){
+        if(Key.isDown(52)){
             gainPower("rotation", 1);
         }
 
-        if(Key.isDown(54)){
+        if(Key.isDown(53)){
             gainPower("ballControl", 1);
+        }
+
+        if(Key.isDown(54)){
+            gainPower("paddleIncrease", 1);
         }
 
 
         // GENERAL CHEATS
 
-        if(Key.isDown(52)){
+        if(Key.isDown(48)){
             activateTripWall();
         }
     }
@@ -579,8 +631,8 @@ console.clear();
     }
 
     function render() {
-        var SCREEN_W = 700;
-        var SCREEN_H = 500;
+        var SCREEN_W = WIDTH;
+        var SCREEN_H = HEIGHT;
 
         var left, bottom, width, height;
 
@@ -618,6 +670,9 @@ console.clear();
 
             // paddle autopilot if needed
             paddleAutopilot();
+
+            // paddle decrease
+            decreasePaddle();
 
             if(farItem.status === "active"){
                 if(farItem.far <= 500){
@@ -690,7 +745,6 @@ console.clear();
             }
 
             if(freezeBall.status === "moving"){
-                console.log(freezeBall.instance.position.z);
                 if(freezeBall.instance.position.z >= 1500 || freezeBall.instance.position.z <= -1500){
                     unfreezePlayer(0);
                     destroyFreezeBall();
@@ -869,7 +923,6 @@ console.clear();
 
     function moveFreezeBall(player){
         var baskIceBall = freezeBall.instance;
-        console.log(baskIceBall.position.z);
         if(player === 1){
             baskIceBall.position.z -= 98;
         }
