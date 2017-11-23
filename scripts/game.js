@@ -36,6 +36,7 @@ console.clear();
         fieldItem = {name: "", instance: "", dimension: {x: 50, y: 50, z: 50}, timestamp: Date.now()},
         farItem = {status: "inactive", player: 0},
         freezeBall = {instance: "", status: "inactive", color: 0xB4CFFA, player: 0, radius: 10, pos: 0, freeze: 0},
+        fieldRotation = {player: 0, status: "inactive"},
         itemDirection = 1,
         backgroundSphere;
 
@@ -47,6 +48,32 @@ console.clear();
             z: direction * 20
         };
         ball.$stopped = false;
+    }
+
+    function activateRotation(player){
+        fieldRotation.player = player;
+        fieldRotation.status = "active";
+    }
+
+    function executeRotation(){
+        var cam;
+
+        if(fieldRotation.status === "active"){
+            if(fieldRotation.player === 1){
+                cam = secondCamera;
+            }
+            else if(fieldRotation.player === 2){
+                cam = primaryCamera;
+            }
+
+            if(cam.rotation.z <= 5*Math.PI){
+                cam.rotation.z += 0.1;
+                if(cam.rotation.z > 5*Math.PI){
+                    cam.rotation.z = Math.PI;
+                    fieldRotation.status = "inactive";
+                }
+            }
+        }
     }
 
     function processCpuPaddle() {
@@ -348,6 +375,12 @@ console.clear();
                         loosePower(1);
                     }
                     break;
+                case "rotation":
+                    if(fieldRotation.status === "inactive"){
+                        activateRotation(1);
+                        loosePower(1);
+                    }
+                    break;
             }
         }
 
@@ -374,6 +407,12 @@ console.clear();
                         loosePower(2);
                     }
                     break;
+                case "rotation":
+                    if(fieldRotation.status === "inactive"){
+                        activateRotation(2);
+                        loosePower(2);
+                    }
+                    break;
             }
         }
 
@@ -390,6 +429,10 @@ console.clear();
             gainPower("baskIceBall", 1);
         }
 
+        if(Key.isDown(53)){
+            gainPower("rotation", 1);
+        }
+
         // CHEATS PLAYER 2
         if(Key.isDown(48)){
             gainPower("farLimiter", 2);
@@ -401,6 +444,10 @@ console.clear();
 
         if(Key.isDown(56)){
             gainPower("baskIceBall", 2);
+        }
+
+        if(Key.isDown(55)){
+            gainPower("rotation", 2);
         }
 
         // GENERAL CHEATS
@@ -445,6 +492,8 @@ console.clear();
         if (running) {
 
             requestAnimationFrame(render);
+
+            executeRotation();
 
             if(farItem.status === "active"){
                 if(farItem.far <= 500){
