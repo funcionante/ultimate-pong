@@ -377,7 +377,7 @@ console.clear();
             }
         }
 
-        // CHEATS
+        // CHEATS PLAYER 1
         if(Key.isDown(49)){
             gainPower("farLimiter", 1);
         }
@@ -389,6 +389,21 @@ console.clear();
         if(Key.isDown(51)){
             gainPower("baskIceBall", 1);
         }
+
+        // CHEATS PLAYER 2
+        if(Key.isDown(48)){
+            gainPower("farLimiter", 2);
+        }
+
+        if(Key.isDown(57)){
+            gainPower("jump", 2);
+        }
+
+        if(Key.isDown(56)){
+            gainPower("baskIceBall", 2);
+        }
+
+        // GENERAL CHEATS
 
         if(Key.isDown(52)){
             activateTripWall();
@@ -485,7 +500,7 @@ console.clear();
             }
 
             processBallMovement();
-            processCpuPaddle();
+            //processCpuPaddle();
             paddleControl();
 
             if(freezeBall.status === "freeze"){
