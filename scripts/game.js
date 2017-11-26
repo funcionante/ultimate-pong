@@ -55,11 +55,20 @@ function gameOver(){
 }
 
 function startGame(players){
+    $('#startimage').hide();
+
     if(players === 1){
         multiplayer = false;
+        $('#player_1_power').show();
+        $('#player_1_score').show();
+
     }
     else if(players === 2){
         multiplayer = true;
+        $('#player_1_power').show();
+        $('#player_1_score').show();
+        $('#player_2_power').show();
+        $('#player_2_score').show();
     }
 
     var difficulty = $('input[name=difficulty]:checked').val();
