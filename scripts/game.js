@@ -193,15 +193,18 @@ function processBallMovement() {
         hitBallBack(paddle1);
     }
 
-    // if hit the left wall
-    if (ballObjectCollision(ball,trapWall.left,BALL_RADIUS,trapWall.dimension)){
-        hitBallBackWall(trapWall.left);
+    if(trapWall.status !== "inactive"){
+        // if hit the left wall
+        if (ballObjectCollision(ball,trapWall.left,BALL_RADIUS,trapWall.dimension)){
+            hitBallBackWall(trapWall.left);
+        }
+
+        // if hit the right wall
+        if (ballObjectCollision(ball,trapWall.right,BALL_RADIUS,trapWall.dimension)){
+            hitBallBackWall(trapWall.right);
+        }
     }
 
-    // if hit the right wall
-    if (ballObjectCollision(ball,trapWall.right,BALL_RADIUS,trapWall.dimension)){
-        hitBallBackWall(trapWall.right);
-    }
 
     // IF HIT PADDLE 2
     if (ballObjectCollision(ball,paddle2,BALL_RADIUS,player_2_paddle.dimension)){
@@ -224,7 +227,9 @@ function processBallMovement() {
         // if hit the item, gain power
         if (ballObjectCollision(ball,fieldItem.instance,BALL_RADIUS,fieldItem.dimension)){
             if(fieldItem.name === "trapWall"){
-                activateTripWall();
+                if(trapWall.status === "inactive"){
+                    activateTripWall();
+                }
             }
             else if(fieldItem.name === "farLimiter"){
                 if(farItem.status === "inactive") {
@@ -323,7 +328,7 @@ function updateBallPosition() {
 function isSideCollision() {
     var ballX = ball.position.x,
         halfFieldWidth = FIELD_WIDTH / 2;
-    return ballX - BALL_RADIUS < -halfFieldWidth || ballX + BALL_RADIUS > halfFieldWidth;
+    return ballX - BALL_RADIUS <= -halfFieldWidth+20 || ballX + BALL_RADIUS >= halfFieldWidth-20;
 }
 
 function hitBallBack(paddle) {
@@ -927,6 +932,9 @@ function activateTripWall(){
     scene.remove(trapWall.left);
     scene.remove(trapWall.right);
 
+    // restart trapWall dimensions
+    trapWall.dimension = {x: 0, y: 0, z: 50};
+
     // generate trapWall objects
     trapWall.left = generateTrapWall(-trapWall.width);
     trapWall.right = generateTrapWall(trapWall.width);
@@ -997,7 +1005,7 @@ function reducePlayerFar(player){
         cam_far = primaryCamera.far;
     }
 
-    if(cam_far > 9000){
+    if(cam_far > 6000){
         cam_far -= 10;
     }
     else if(cam_far > 4000){
@@ -1010,7 +1018,7 @@ function reducePlayerFar(player){
         cam_far -= 5;
     }
     else{
-        cam_far -= 50;
+        cam_far -= 5;
     }
 
 
