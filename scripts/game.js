@@ -650,7 +650,7 @@ function ballHijack(mov){
 
 function cameraTracking(){
     if(ballControl.status === "active"){
-        if(ball.$velocity === null){
+        if(ballControl.timestamp + 20000 < Date.now() || ball.$velocity === null){
             ballControl.status = "inactive";
             cameraReset(ballControl.player);
             ballControl.player = 0;
@@ -690,13 +690,13 @@ function cameraReset(player){
         paddle1.position.z = FIELD_LENGTH / 2;
         paddle1.position.x = 0;
         primaryCamera.position.set(0, 200, (FIELD_LENGTH / 2 + 500));
-        primaryCamera.lookAt(ball.position);
+        primaryCamera.lookAt(new THREE.Vector3( 0, 0, 0 ));
     }
     else if(player === 2){
         paddle2.position.z = - FIELD_LENGTH / 2;
         paddle2.position.x = 0;
         secondCamera.position.set(0, 200, -(FIELD_LENGTH / 2 + 500));
-        secondCamera.lookAt(ball.position);
+        secondCamera.lookAt(new THREE.Vector3( 0, 0, 0 ));
     }
 }
 
