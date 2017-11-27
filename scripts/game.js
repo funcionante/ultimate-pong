@@ -16,12 +16,12 @@ var WIDTH = window.innerWidth,
     CAMERA_MIN_DISTANCE = (FIELD_LENGTH / 2 + 500),
 
     //get the scoreboard element.
-    player_1_score = document.getElementById('player_1_score'),
-    player_2_score = document.getElementById('player_2_score'),
+    player_1_score,
+    player_2_score,
 
     //playerPower
-    player_1_power = document.getElementById('player_1_power'),
-    player_2_power = document.getElementById('player_2_power'),
+    player_1_power,
+    player_2_power,
 
     //declare members.
     container, renderer, primaryCamera, mainLight, sunLight, secondCamera,
@@ -46,8 +46,6 @@ var WIDTH = window.innerWidth,
     cameraPosition = {height: {player1: CAMERA_MIN_HEIGHT, player2: CAMERA_MIN_HEIGHT}, distance: {player1: CAMERA_MIN_DISTANCE, player2: -CAMERA_MIN_DISTANCE}},
     sunAngle = 4.5;
 
-$("[name='my-checkbox']").bootstrapSwitch();
-
 function gameOver(){
     if(score.player1 >= 10){
         $('#result_player').text("PLAYER 1 WIN!");
@@ -63,19 +61,17 @@ function gameOver(){
 
 function startGame(players){
     $('body').css("background-color","white");
-
     if(players === 1){
         multiplayer = false;
+        $('#upper_content').append('<div id="player_2_score" class="player_score player_2_score" style="right: 5px; top: 5px;position:relative;float: right"> 0 </div> <div id="player_1_score" class="player_score player_1_score" style="right: -40px; top: 55px;position:relative;float: right"> 0 </div>');
         $('#player_1_power').show();
-        $('#player_1_score').show();
-
     }
     else if(players === 2){
         multiplayer = true;
+        $('#upper_content').append('<div id="player_1_score" class="multiplayer player_score player_1_score" style="right: 5px; top: 5px;position:relative;float: right"> 0 </div>');
+        $('#lower_content').append('<div id="player_2_score" class="multiplayer player_score player_2_score" style="right: 5px; top: 5px;position:relative;float: right"> 0 </div>');
         $('#player_1_power').show();
-        $('#player_1_score').show();
         $('#player_2_power').show();
-        $('#player_2_score').show();
     }
 
     if($('#difficulty').is(":checked")){
@@ -90,6 +86,14 @@ function startGame(players){
     }
 
     $( "#menu" ).hide();
+
+    //get the scoreboard element.
+    player_1_score = document.getElementById('player_1_score'),
+    player_2_score = document.getElementById('player_2_score'),
+
+    //playerPower
+    player_1_power = document.getElementById('player_1_power'),
+    player_2_power = document.getElementById('player_2_power'),
 
     init();
 }
