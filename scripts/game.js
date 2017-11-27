@@ -14,6 +14,7 @@ var WIDTH = window.innerWidth,
     CAMERA_MIN_HEIGHT = 200,
     CAMERA_MAX_HEIGHT = 800,
     CAMERA_MIN_DISTANCE = (FIELD_LENGTH / 2 + 500),
+    GAME_OVER = 10,
 
     //get the scoreboard element.
     player_1_score = document.getElementById('player_1_score'),
@@ -49,12 +50,12 @@ var WIDTH = window.innerWidth,
 $("[name='my-checkbox']").bootstrapSwitch();
 
 function gameOver(){
-    if(score.player1 >= 10){
+    if(score.player1 >= GAME_OVER){
         $('#result_player').text("PLAYER 1 WIN!");
         $('#result').show();
         stopBall();
     }
-    else if(score.player2 >= 10){
+    else if(score.player2 >= GAME_OVER){
         $('#result_player').text("PLAYER 2 WIN!");
         $('#result').show();
         stopBall();
