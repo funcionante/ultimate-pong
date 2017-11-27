@@ -325,6 +325,10 @@ function isPastPaddle2() {
 function updateBallPosition() {
     var ballPos = ball.position;
 
+    //ball rotation
+    ball.rotation.x += ball.$velocity.z/70; // foreword
+    ball.rotation.z += ball.$velocity.x/70; // side
+
     //update the ball's position.
     ballPos.x += ball.$velocity.x;
     ballPos.z += ball.$velocity.z;
@@ -1214,10 +1218,13 @@ function init() {
     trapWall.left = generateTrapWall(-trapWall.width);
     trapWall.right = generateTrapWall(trapWall.width);
 
+    var ballTexture = THREE.ImageUtils.loadTexture("images/ball.jpg");
+    ballTexture.minFilter = THREE.LinearFilter;
+
     // set ball
     var ballGeometry = new THREE.SphereGeometry(BALL_RADIUS, 16, 16),
-        ballMaterial = new THREE.MeshLambertMaterial({
-            color: 0x0FF0FF
+        ballMaterial = new THREE.MeshBasicMaterial({
+            map: ballTexture
         });
     ball = new THREE.Mesh(ballGeometry, ballMaterial);
     scene.add(ball);
