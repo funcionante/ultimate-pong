@@ -1033,7 +1033,7 @@ function wallBuild(){
         trapWall.right.scale.y += 0.4;
         trapWall.right.position.y += 2;
 
-        trapWall.dimension.y += trapWall.startDim.y * 0.1;
+        trapWall.dimension.y += trapWall.startDim.y * 0.4;
     }
 
     if(trapWall.left.position.y >= 100 && trapWall.right.position.y >= 100){
