@@ -60,7 +60,7 @@ function gameOver(){
 }
 
 function startGame(players){
-    $('#startimage').hide();
+    $('body').css("background-color","white");
 
     if(players === 1){
         multiplayer = false;
@@ -76,15 +76,15 @@ function startGame(players){
         $('#player_2_score').show();
     }
 
-    var difficulty = $('input[name=difficulty]:checked').val();
+    console.log($('#difficulty').is(":checked"));
 
-    if(difficulty === "easy"){
+    if($('#difficulty').is(":checked")){
         fieldItem.dimension.x *= 2;
         fieldItem.dimension.y *= 2;
         fieldItem.dimension.z *= 2;
 
     }
-    else if(difficulty === "hard"){
+    else{
         player_1_paddle.dimension.x /= 2;
         player_2_paddle.dimension.x /= 2;
     }

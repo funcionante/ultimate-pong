@@ -1,0 +1,28 @@
+body{
+    margin:0;
+}
+.player_score {
+    border: 3px solid #FFF;
+    border-radius: 5px;
+    color: #FFF;
+    font-family: arial;
+}
+.player_power {
+    position: absolute;
+    border: 3px solid #FFF;
+    border-radius: 5px;
+    color: #FFF;
+    font-family: arial;
+}
+.player_1_score {
+    background: #AA3333;
+    font-size: 20pt;
+    font-weight: bold;
+    padding: 5px;
+}
+.player_2_score {
+    background: #3F51B5;
+    font-size: 20pt;
+    font-weight: bold;
+    padding: 5px;
+}
