@@ -46,6 +46,8 @@ var WIDTH = window.innerWidth,
     cameraPosition = {height: {player1: CAMERA_MIN_HEIGHT, player2: CAMERA_MIN_HEIGHT}, distance: {player1: CAMERA_MIN_DISTANCE, player2: -CAMERA_MIN_DISTANCE}},
     sunAngle = 4.5;
 
+$("[name='my-checkbox']").bootstrapSwitch();
+
 function gameOver(){
     if(score.player1 >= 10){
         $('#result_player').text("PLAYER 1 WIN!");
@@ -75,8 +77,6 @@ function startGame(players){
         $('#player_2_power').show();
         $('#player_2_score').show();
     }
-
-    console.log($('#difficulty').is(":checked"));
 
     if($('#difficulty').is(":checked")){
         fieldItem.dimension.x *= 2;
