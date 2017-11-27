@@ -11,6 +11,9 @@ var WIDTH = window.innerWidth,
     FIELD_LENGTH = 3000,
     BALL_RADIUS = 20,
     BALL_JUMP_POSITION = 0,
+    CAMERA_MIN_HEIGHT = 200,
+    CAMERA_MAX_HEIGHT = 800,
+    CAMERA_MIN_DISTANCE = (FIELD_LENGTH / 2 + 500),
 
     //get the scoreboard element.
     player_1_score = document.getElementById('player_1_score'),
@@ -39,7 +42,8 @@ var WIDTH = window.innerWidth,
     ballControl = {player: 0, status: "inactive", timestamp: 0},
     paddleIncrease = {player: 0, status: "inactive", timestamp: 0},
     itemDirection = 1,
-    backgroundSphere;
+    backgroundSphere,
+    cameraPosition = {height: {player1: CAMERA_MIN_HEIGHT, player2: CAMERA_MIN_HEIGHT}, distance: {player1: CAMERA_MIN_DISTANCE, player2: -CAMERA_MIN_DISTANCE}};
 
 function gameOver(){
     if(score.player1 >= 10){
@@ -459,9 +463,11 @@ function paddleControl(){
         }
         else if (paddle1.position.x > -(600-player_1_paddle.dimension.x/2)){
             paddle1.position.x -= 10;
+            primaryCamera.lookAt(new THREE.Vector3( 0, 0, 0 ));
         }
 
     }
+
     // player 1 go right
     if(Key.isDown(68)){
         if(ballControl.status === "active" && ballControl.player === 1){
@@ -469,6 +475,7 @@ function paddleControl(){
         }
         else if(paddle1.position.x < (600-player_1_paddle.dimension.x/2)){
             paddle1.position.x += 10;
+            primaryCamera.lookAt(new THREE.Vector3( 0, 0, 0 ));
         }
     }
 
@@ -480,8 +487,10 @@ function paddleControl(){
         }
         else if (paddle2.position.x < (600-player_2_paddle.dimension.x/2)){
             paddle2.position.x += 10;
+            secondCamera.lookAt(new THREE.Vector3( 0, 0, 0 ));
         }
     }
+
     // player 2 go right
     if(Key.isDown(39)){
         if(ballControl.status === "active" && ballControl.player === 2){
@@ -491,6 +500,55 @@ function paddleControl(){
         }
         else if (paddle2.position.x > -(600-player_2_paddle.dimension.x/2)){
             paddle2.position.x -= 10;
+            secondCamera.lookAt(new THREE.Vector3( 0, 0, 0 ));
+        }
+    }
+
+    // player 1 camera up
+    if(Key.isDown(87)){
+        if (cameraPosition.height.player1 < CAMERA_MAX_HEIGHT) {
+            cameraPosition.height.player1 += 10;
+            cameraPosition.distance.player1 += 10;
+
+            primaryCamera.position.y = cameraPosition.height.player1;
+            primaryCamera.position.z = cameraPosition.distance.player1;
+            primaryCamera.lookAt(new THREE.Vector3( 0, 0, 0 ));
+        }
+    }
+
+    // player 1 camera down
+    if(Key.isDown(83)){
+        if (cameraPosition.height.player1 > CAMERA_MIN_HEIGHT) {
+            cameraPosition.height.player1 -= 10;
+            cameraPosition.distance.player1 -= 10;
+
+            primaryCamera.position.y = cameraPosition.height.player1;
+            primaryCamera.position.z = cameraPosition.distance.player1;
+            primaryCamera.lookAt(new THREE.Vector3( 0, 0, 0 ));
+        }
+    }
+
+    // player 2 camera up
+    if(Key.isDown(38)){
+        if (cameraPosition.height.player2 < CAMERA_MAX_HEIGHT) {
+            cameraPosition.height.player2 += 10;
+            cameraPosition.distance.player2 -= 10;
+
+            secondCamera.position.y = cameraPosition.height.player2;
+            secondCamera.position.z = cameraPosition.distance.player2;
+            secondCamera.lookAt(new THREE.Vector3( 0, 0, 0 ));
+        }
+    }
+
+    // player 2 camera down
+    if(Key.isDown(40)){
+        if (cameraPosition.height.player2 > CAMERA_MIN_HEIGHT) {
+            cameraPosition.height.player2 -= 10;
+            cameraPosition.distance.player2 += 10;
+
+            secondCamera.position.y = cameraPosition.height.player2;
+            secondCamera.position.z = cameraPosition.distance.player2;
+            secondCamera.lookAt(new THREE.Vector3( 0, 0, 0 ));
         }
     }
 
@@ -703,13 +761,13 @@ function cameraReset(player){
     if(player === 1){
         paddle1.position.z = FIELD_LENGTH / 2;
         paddle1.position.x = 0;
-        primaryCamera.position.set(0, 200, (FIELD_LENGTH / 2 + 500));
+        primaryCamera.position.set(0, cameraPosition.height.player1, cameraPosition.distance.player1);
         primaryCamera.lookAt(new THREE.Vector3( 0, 0, 0 ));
     }
     else if(player === 2){
         paddle2.position.z = - FIELD_LENGTH / 2;
         paddle2.position.x = 0;
-        secondCamera.position.set(0, 200, -(FIELD_LENGTH / 2 + 500));
+        secondCamera.position.set(0, cameraPosition.height.player2, cameraPosition.distance.player2);
         secondCamera.lookAt(new THREE.Vector3( 0, 0, 0 ));
     }
 }
@@ -1115,10 +1173,10 @@ function init() {
     container.appendChild(renderer.domElement);
 
     primaryCamera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
-    primaryCamera.position.set(0, 200, FIELD_LENGTH / 2 + 500);
+    primaryCamera.position.set(0, cameraPosition.height.player1, FIELD_LENGTH / 2 + 500);
 
     secondCamera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
-    secondCamera.position.set(0, 200, -(FIELD_LENGTH / 2 + 500));
+    secondCamera.position.set(0, cameraPosition.height.player2, -(FIELD_LENGTH / 2 + 500));
 
     scene = new THREE.Scene();
     scene.add(primaryCamera);
