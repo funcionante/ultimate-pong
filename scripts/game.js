@@ -676,6 +676,9 @@ function paddleControl(){
         }
     }
 
+    if(Key.isDown(55)){
+        activateRotation(1);
+    }
 
     // GENERAL CHEATS
 
@@ -722,7 +725,7 @@ function ballHijack(mov){
 
 function cameraTracking(){
     if(ballControl.status === "active"){
-        if(ballControl.timestamp + 20000 < Date.now() || ball.$velocity === null){
+        if(ballControl.timestamp + 5000 < Date.now() || ball.$velocity === null){
             ballControl.status = "inactive";
             cameraReset(ballControl.player);
             ballControl.player = 0;
@@ -895,7 +898,7 @@ function render() {
         paddleControl();
 
         if(freezeBall.status === "freeze"){
-            if(freezeBall.timestamp + 10000 < Date.now()){
+            if(freezeBall.timestamp + 3000 < Date.now()){
                 unfreezePlayer(freezeBall.freeze);
             }
 
@@ -1013,11 +1016,11 @@ function activateTripWall(){
 function wallBuild(){
     // wall gaining height
     if(trapWall.left.position.y < 100){
-        trapWall.left.scale.y += 0.1;
-        trapWall.left.position.y += 0.5;
+        trapWall.left.scale.y += 0.4;
+        trapWall.left.position.y += 2;
 
-        trapWall.right.scale.y += 0.1;
-        trapWall.right.position.y += 0.5;
+        trapWall.right.scale.y += 0.4;
+        trapWall.right.position.y += 2;
 
         trapWall.dimension.y += trapWall.startDim.y * 0.1;
     }
@@ -1073,21 +1076,14 @@ function reducePlayerFar(player){
     }
 
     if(cam_far > 6000){
-        cam_far -= 10;
+        cam_far -= 20;
     }
-    else if(cam_far > 4000){
-        cam_far = 4000;
-    }
-    else if(cam_far > 2000){
-        cam_far -= 10;
-    }
-    else if(cam_far > 1000){
-        cam_far -= 5;
+    else if(cam_far > 3500){
+        cam_far = 3500;
     }
     else{
-        cam_far -= 5;
+        cam_far -= 10;
     }
-
 
     // assign cam to respective camera
     if(player === 1){
