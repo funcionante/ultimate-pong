@@ -24,7 +24,7 @@ var WIDTH = window.innerWidth,
     player_2_power = document.getElementById('player_2_power'),
 
     //declare members.
-    container, renderer, primaryCamera, mainLight, secondCamera,
+    container, renderer, primaryCamera, mainLight, sunLight, secondCamera,
     scene, ball, paddle1, paddle2, field, running,multiplayer = false,
     score = {
         player1: 0,
@@ -43,7 +43,8 @@ var WIDTH = window.innerWidth,
     paddleIncrease = {player: 0, status: "inactive", timestamp: 0},
     itemDirection = 1,
     backgroundSphere,
-    cameraPosition = {height: {player1: CAMERA_MIN_HEIGHT, player2: CAMERA_MIN_HEIGHT}, distance: {player1: CAMERA_MIN_DISTANCE, player2: -CAMERA_MIN_DISTANCE}};
+    cameraPosition = {height: {player1: CAMERA_MIN_HEIGHT, player2: CAMERA_MIN_HEIGHT}, distance: {player1: CAMERA_MIN_DISTANCE, player2: -CAMERA_MIN_DISTANCE}},
+    sunAngle = 4.5;
 
 function gameOver(){
     if(score.player1 >= 10){
@@ -775,6 +776,13 @@ function cameraReset(player){
     }
 }
 
+function moveSun() {
+    sunAngle += 0.005;
+    sunLight.position.x = Math.sin( sunAngle ) * 5000;
+    sunLight.position.y = Math.cos( sunAngle ) * 5000;
+    sunLight.position.z = Math.sin( sunAngle ) * 10000;
+}
+
 function render() {
     var SCREEN_W = WIDTH;
     var SCREEN_H = HEIGHT;
@@ -830,6 +838,9 @@ function render() {
         }
         // camera following paddle
         cameraTracking();
+
+        // move sun
+        moveSun();
 
         // rotation item
         executeRotation();
@@ -1207,8 +1218,19 @@ function init() {
     secondCamera.lookAt(ball.position);
 
     // set light
-    mainLight = new THREE.HemisphereLight(0xFFFFFF, 0x003300);
+    mainLight = new THREE.HemisphereLight(0xFFFFFF, 0x003300, 0.4);
     scene.add(mainLight);
+
+    // set "sun"
+    sunLight = new THREE.PointLight( 0xffffff, 1, 30000 );
+    moveSun();
+    scene.add(sunLight);
+
+    var sunGeometry = new THREE.SphereGeometry(500, 32, 32);
+    var sunTexture = THREE.ImageUtils.loadTexture('images/sun.jpg');
+    var sunMaterial = new THREE.MeshBasicMaterial({ map: sunTexture  });
+    var sunSphere = new THREE.Mesh(sunGeometry, sunMaterial);
+    sunLight.add(sunSphere);
 
     // set background
     var backgroundTexture = THREE.ImageUtils.loadTexture("images/background-universe.jpg");
