@@ -100,23 +100,25 @@ function startGame(players){
 }
 
 function increasePaddle(player){
-    paddleIncrease.status = "active";
-    paddleIncrease.player = player;
-    paddleIncrease.timestamp = Date.now();
+    if(paddleIncrease.status === "inactive"){
+        paddleIncrease.status = "active";
+        paddleIncrease.player = player;
+        paddleIncrease.timestamp = Date.now();
 
-    var inc = 2.5;
+        var inc = 2.5;
 
-    if(player === 1){
-        paddle1.scale.x *= inc;
-        player_1_paddle.dimension.x *= inc;
-        paddle2.scale.x /= inc;
-        player_2_paddle.dimension.x /= inc;
-    }
-    else if(player === 2) {
-        paddle2.scale.x *= inc;
-        player_2_paddle.dimension.x *= inc;
-        paddle1.scale.x /= inc;
-        player_1_paddle.dimension.x /= inc;
+        if(player === 1){
+            paddle1.scale.x *= inc;
+            player_1_paddle.dimension.x *= inc;
+            paddle2.scale.x /= inc;
+            player_2_paddle.dimension.x /= inc;
+        }
+        else if(player === 2) {
+            paddle2.scale.x *= inc;
+            player_2_paddle.dimension.x *= inc;
+            paddle1.scale.x /= inc;
+            player_1_paddle.dimension.x /= inc;
+        }
     }
 }
 
@@ -805,7 +807,7 @@ function render() {
         height = 0.5 * SCREEN_H - 2;
         renderer.setViewport(left, bottom, width, height);
         renderer.setScissor(left, bottom, width, height);
-        renderer.enableScissorTest(true);
+        renderer.setScissorTest(true);
         secondCamera.aspect = width / height;
         secondCamera.updateProjectionMatrix();
         renderer.render(scene, secondCamera);
@@ -816,7 +818,7 @@ function render() {
         height = 0.5 * SCREEN_H - 2;
         renderer.setViewport(left, bottom, width, height);
         renderer.setScissor(left, bottom, width, height);
-        renderer.enableScissorTest(true); // clip out "viewport"
+        renderer.setScissorTest(true); // clip out "viewport"
         primaryCamera.aspect = width / height;
         primaryCamera.updateProjectionMatrix();
         renderer.render(scene, primaryCamera);
@@ -828,7 +830,7 @@ function render() {
         height = SCREEN_H;
         renderer.setViewport(left, bottom, width, height);
         renderer.setScissor(left, bottom, width, height);
-        renderer.enableScissorTest(true); // clip out "viewport"
+        renderer.setScissorTest(true); // clip out "viewport"
         primaryCamera.aspect = width / height;
         primaryCamera.updateProjectionMatrix();
         renderer.render(scene, primaryCamera);
