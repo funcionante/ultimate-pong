@@ -1153,11 +1153,14 @@ function generateRandomItem(){
 }
 
 function generateTrapWall(pos){
+    var wallImage = THREE.ImageUtils.loadTexture('images/wall.jpg');
+    var wallMaterial = new THREE.MeshPhongMaterial({map: wallImage});
     var itemGeometry = new THREE.CubeGeometry(trapWall.startDim.x, trapWall.startDim.y, trapWall.startDim.z, 1, 1, 1),
+
         itemMaterial = new THREE.MeshLambertMaterial({
             color: trapWall.color
         }),
-        wall = new THREE.Mesh(itemGeometry, itemMaterial);
+        wall = new THREE.Mesh(itemGeometry, wallMaterial);
 
     // adding wall to scene
     scene.add(wall);
@@ -1264,10 +1267,9 @@ function addPaddle(paddle_prop, color_paddle) {
 }
 
 function addItem(){
-    var itemGeometry = new THREE.CubeGeometry(fieldItem.dimension.x, fieldItem.dimension.y, fieldItem.dimension.z, 1, 1, 1),
-        itemMaterial = new THREE.MeshLambertMaterial({
-            color: 0xFF0000
-        }),
+    var itemImage = THREE.ImageUtils.loadTexture('images/box.jpg'),
+        itemMaterial = new THREE.MeshPhongMaterial({map: itemImage}),
+        itemGeometry = new THREE.CubeGeometry(fieldItem.dimension.x, fieldItem.dimension.y, fieldItem.dimension.z, 1, 1, 1),
         item = new THREE.Mesh(itemGeometry, itemMaterial);
     scene.add(item);
 
