@@ -73,6 +73,7 @@ function startGame(players){
         $('#lower_content').append('<div id="player_2_score" class="multiplayer player_score player_2_score" style="right: 5px; top: 5px;position:relative;float: right"> 0 </div>');
         $('#player_1_power').show();
         $('#player_2_power').show();
+        $('#lower_content').css({'border' : '0px', 'border-top' : '1px #FFFFFF' , 'border-style' : 'solid'});
     }
 
     if($('#difficulty').is(":checked")){
