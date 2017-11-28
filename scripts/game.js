@@ -25,7 +25,7 @@ var WIDTH = window.innerWidth,
     player_2_power,
 
     //declare members.
-    container, renderer, primaryCamera, mainLight, sunLight, secondCamera,
+    container, renderer, primaryCamera, mainLight, moon, secondCamera,
     scene, ball, paddle1, paddle2, field, running,multiplayer = false,
     score = {
         player1: 0,
@@ -45,7 +45,7 @@ var WIDTH = window.innerWidth,
     itemDirection = 1,
     backgroundSphere,
     cameraPosition = {height: {player1: CAMERA_MIN_HEIGHT, player2: CAMERA_MIN_HEIGHT}, distance: {player1: CAMERA_MIN_DISTANCE, player2: -CAMERA_MIN_DISTANCE}},
-    sunAngle = 4.5;
+    moonAngle = 4.5;
 
 function gameOver(){
     if(score.player1 >= GAME_OVER){
@@ -812,12 +812,11 @@ function cameraReset(player){
     }
 }
 
-function moveSun() {
-    sunAngle += 0.005;
-    sunLight.position.x = Math.sin( sunAngle ) * 5000;
-    sunLight.position.y = Math.cos( sunAngle ) * 5000;
-    sunLight.position.z = Math.sin( sunAngle ) * 10000;
-    sunLight.rotation.x += 1;
+function moveMoon() {
+    moonAngle += 0.01;
+    moon.position.x = Math.sin( moonAngle ) * 1500;
+    moon.position.y = Math.cos( moonAngle ) * 1500;
+    moon.position.z = Math.sin( moonAngle ) * 1500;
 }
 
 function render() {
@@ -877,7 +876,7 @@ function render() {
         cameraTracking();
 
         // move sun
-        moveSun();
+        moveMoon();
 
         // rotation item
         executeRotation();
@@ -1150,6 +1149,10 @@ function createFreezeBall(player){
             color: freezeBall.color
         }),
     baskIceBall = new THREE.Mesh(freezeBallInstance, freezeBallMaterial);
+    // set shadow
+    baskIceBall.castShadow = true;
+    baskIceBall.receiveShadow = true;
+
     scene.add(baskIceBall);
 
     if(player === 1){
@@ -1276,9 +1279,11 @@ function init() {
     sunLight.shadow.mapSize.height = 512; // default
     sunLight.shadow.camera.near = 0.5;       // default
     sunLight.shadow.camera.far = 9000;      // default
-    sunLight.shadow.camera.rotation.x = 50;
 
-    moveSun();
+    sunLight.position.x = -2000;
+    sunLight.position.y = 5000;
+    sunLight.position.z = -1000;
+
     scene.add(sunLight);
 
     // sun helper
@@ -1290,15 +1295,19 @@ function init() {
     var fieldMaterial = new THREE.MeshPhongMaterial({map: textureImage});
     field = new THREE.Mesh(fieldGeometry, fieldMaterial);
     field.position.set(0, -20, 0);
-    field.castShadow = false;
+    field.castShadow = true;
     field.receiveShadow = true;
     scene.add(field);
 
-    var sunGeometry = new THREE.SphereGeometry(500, 32, 32);
-    var sunTexture = THREE.ImageUtils.loadTexture('images/sun.jpg');
-    var sunMaterial = new THREE.MeshBasicMaterial({ map: sunTexture  });
-    var sunSphere = new THREE.Mesh(sunGeometry, sunMaterial);
-    sunLight.add(sunSphere);
+    var moonGeometry = new THREE.SphereGeometry(500, 32, 32);
+    var moonTexture = THREE.ImageUtils.loadTexture('images/moon.jpg');
+    var moonMaterial = new THREE.MeshLambertMaterial({ map: moonTexture  });
+    moon = new THREE.Mesh(moonGeometry, moonMaterial);
+    moon.receiveShadow = true;
+    moon.castShadow = true;
+    moveMoon();
+
+    scene.add(moon);
 
     // set background
     var backgroundTexture = THREE.ImageUtils.loadTexture("images/background-universe.jpg");
@@ -1344,9 +1353,3 @@ function addItem(){
 
     return item;
 }
-
-/*function containerMouseMove(e) {
-    var mouseX = e.clientX;
-    primaryCamera.position.x = paddle1.position.x = -((WIDTH - mouseX) / WIDTH * FIELD_WIDTH) + (FIELD_WIDTH / 2);
-    secondCamera.position.x = paddle2.position.x;
-}*/
