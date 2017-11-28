@@ -243,10 +243,10 @@ function processBallMovement() {
     if(fieldItem.instance !== ""){
         fieldItem.instance.rotation.y += 0.05;
 
-        if (fieldItem.instance.position.y >= 70){
+        if (fieldItem.instance.position.y - fieldItem.dimension.y/2 >= 20){
             itemDirection = -1;
         }
-        else if(fieldItem.instance.position.y <= 50){
+        else if(fieldItem.instance.position.y - fieldItem.dimension.y/2 <= 0){
             itemDirection = 1;
         }
 
