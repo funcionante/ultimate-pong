@@ -1208,7 +1208,7 @@ function init() {
 
     renderer = new THREE.WebGLRenderer( { antialias: true } );
     renderer.shadowMap.type = THREE.PCFShadowMap;
-    renderer.shadowMap.enabled = false;
+    renderer.shadowMap.enabled = true;
     renderer.setSize(WIDTH, HEIGHT);
     renderer.setClearColor(0x000000, 1);
     container.appendChild(renderer.domElement);
