@@ -205,8 +205,15 @@ function processBallMovement() {
 
     updateBallPosition();
 
-    if (isSideCollision()) {
-        ball.$velocity.x *= -1;
+    if (isSideCollision() === "left") {
+        if(ball.$velocity.x > 0){
+            ball.$velocity.x *= -1;
+        }
+    }
+    else if (isSideCollision() === "right") {
+        if(ball.$velocity.x < 0){
+            ball.$velocity.x *= -1;
+        }
     }
 
     // IF HIT PADDLE 1
@@ -353,7 +360,16 @@ function updateBallPosition() {
 function isSideCollision() {
     var ballX = ball.position.x,
         halfFieldWidth = FIELD_WIDTH / 2;
-    return ballX - BALL_RADIUS <= -halfFieldWidth+20 || ballX + BALL_RADIUS >= halfFieldWidth-20;
+
+    if(ballX - BALL_RADIUS <= -halfFieldWidth+20){
+        return "right";
+    }
+    else if(ballX + BALL_RADIUS >= halfFieldWidth-20) {
+        return "left";
+    }
+    else{
+        return null;
+    }
 }
 
 function hitBallBack(paddle) {
@@ -361,10 +377,23 @@ function hitBallBack(paddle) {
     ball.$velocity.z *= -1;
 }
 
-// TODO: improve bounce algorithm
-function hitBallBackWall(paddle) {
-    ball.$velocity.x = (ball.position.x - paddle.position.x) / 10;
-    ball.$velocity.z *= -1;
+function wallSide(wall){
+    if(wall.position.z > ball.position.z){
+        return "front";
+    }
+    else{
+        return "back";
+    }
+}
+
+function hitBallBackWall(wall) {
+    ball.$velocity.x = (ball.position.x - wall.position.x) / 10;
+    if(wallSide(wall) === "front" && ball.$velocity.z > 0){
+        ball.$velocity.z *= -1;
+    }
+    else if(wallSide(wall) === "back" && ball.$velocity.z < 0){
+        ball.$velocity.z *= -1;
+    }
 }
 
 function ballObjectCollision(ballObject,object,ball_radius,object_dims){
