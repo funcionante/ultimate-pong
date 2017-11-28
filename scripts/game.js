@@ -688,10 +688,6 @@ function paddleControl(){
         }
     }
 
-    if(Key.isDown(55)){
-        activateRotation(1);
-    }
-
     // GENERAL CHEATS
 
     if(Key.isDown(48)){
