@@ -32,11 +32,15 @@
                 <div onclick="startGame(1)" id="single"><p>SINGLE PLAYER</p></div>
                 <div onclick="startGame(2)" id="multiplayer"><p>MULTIPLAYER</p></div>
                 <div id="options"><p><input id="difficulty" type="checkbox" data-on-text="Easy" data-off-text="Hard" name="my-checkbox" checked></p></div>
-                <div onClick="location.href='credits.html'" id="credits"><p>CREDITS</p></div>
+                <div id="credits">
+                    <p><div class="tooltip">CREDITS
+                        <span class="tooltiptext">Denis Bartashevich, 76537<br>Leonardo Oliveira, 76725</span>
+                    </div></p>
+                </div>
                 <div id="right"></div>
                 <div id="exit">
                     <div class="tooltip">?
-                        <span class="tooltiptext">Player 1: WASD and Space<br>Player 2: Arrows and K</span>
+                        <span class="tooltiptext" style="z-index: 100">Player 1: WASD and Space<br>Player 2: Arrows and K</span>
                     </div>
                 </div>
                 <div id="circle"></div>

@@ -817,6 +817,7 @@ function moveSun() {
     sunLight.position.x = Math.sin( sunAngle ) * 5000;
     sunLight.position.y = Math.cos( sunAngle ) * 5000;
     sunLight.position.z = Math.sin( sunAngle ) * 10000;
+    sunLight.rotation.x += 1;
 }
 
 function render() {
@@ -1275,6 +1276,7 @@ function init() {
     sunLight.shadow.mapSize.height = 512; // default
     sunLight.shadow.camera.near = 0.5;       // default
     sunLight.shadow.camera.far = 9000;      // default
+    sunLight.shadow.camera.rotation.x = 50;
 
     moveSun();
     scene.add(sunLight);
