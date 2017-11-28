@@ -45,7 +45,7 @@ var WIDTH = window.innerWidth,
     itemDirection = 1,
     backgroundSphere,
     cameraPosition = {height: {player1: CAMERA_MIN_HEIGHT, player2: CAMERA_MIN_HEIGHT}, distance: {player1: CAMERA_MIN_DISTANCE, player2: -CAMERA_MIN_DISTANCE}},
-    moonAngle = 4.5;
+    moonAngle = 2.0;
 
 function gameOver(){
     if(score.player1 >= GAME_OVER){
@@ -241,7 +241,7 @@ function processBallMovement() {
 
     // if item exists, rotate
     if(fieldItem.instance !== ""){
-        fieldItem.instance.rotation.y += 0.1;
+        fieldItem.instance.rotation.y += 0.05;
 
         if (fieldItem.instance.position.y >= 70){
             itemDirection = -1;
@@ -813,10 +813,10 @@ function cameraReset(player){
 }
 
 function moveMoon() {
-    moonAngle += 0.01;
-    moon.position.x = Math.sin( moonAngle ) * 1500;
-    moon.position.y = Math.cos( moonAngle ) * 1500;
-    moon.position.z = Math.sin( moonAngle ) * 1500;
+    moonAngle += 0.0005;
+    moon.position.x = Math.sin( moonAngle ) * 4000;
+    moon.position.y = 700;
+    moon.position.z = Math.cos( moonAngle ) * 4000;
 }
 
 function render() {
@@ -1264,7 +1264,7 @@ function init() {
     secondCamera.lookAt(ball.position);
 
     // set light
-    mainLight = new THREE.HemisphereLight(0xFFFFFF, 0x003300, 0.4);
+    mainLight = new THREE.HemisphereLight(0xFFFFFF, 0x003300, 0.6);
     scene.add(mainLight);
 
     // set "sun"
@@ -1278,33 +1278,29 @@ function init() {
     sunLight.shadow.mapSize.width = 512;  // default
     sunLight.shadow.mapSize.height = 512; // default
     sunLight.shadow.camera.near = 0.5;       // default
-    sunLight.shadow.camera.far = 9000;      // default
+    sunLight.shadow.camera.far = 10000;      // default
 
     sunLight.position.x = -2000;
-    sunLight.position.y = 5000;
+    sunLight.position.y = 8000;
     sunLight.position.z = -1000;
 
     scene.add(sunLight);
-
-    // sun helper
-    var helper = new THREE.CameraHelper( sunLight.shadow.camera );
-    scene.add( helper );
 
     var fieldGeometry = new THREE.CubeGeometry(FIELD_WIDTH, 5, FIELD_LENGTH, 1, 1, 1),
         textureImage = THREE.ImageUtils.loadTexture('images/football-field.jpg');
     var fieldMaterial = new THREE.MeshPhongMaterial({map: textureImage});
     field = new THREE.Mesh(fieldGeometry, fieldMaterial);
     field.position.set(0, -20, 0);
-    field.castShadow = true;
+    field.castShadow = false;
     field.receiveShadow = true;
     scene.add(field);
 
-    var moonGeometry = new THREE.SphereGeometry(500, 32, 32);
+    var moonGeometry = new THREE.SphereGeometry(400, 32, 32);
     var moonTexture = THREE.ImageUtils.loadTexture('images/moon.jpg');
     var moonMaterial = new THREE.MeshLambertMaterial({ map: moonTexture  });
     moon = new THREE.Mesh(moonGeometry, moonMaterial);
     moon.receiveShadow = true;
-    moon.castShadow = true;
+    moon.castShadow = false;
     moveMoon();
 
     scene.add(moon);
