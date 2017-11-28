@@ -31,14 +31,14 @@ var WIDTH = window.innerWidth,
         player1: 0,
         player2: 0
     },
-    player_1_paddle = {dimension: {z: 10, y: 30, x: 200}, color: 0xAA3333, autopilot: false},
-    player_2_paddle = {dimension: {z: 10, y: 30, x: 200}, color: 0x3F51B5, autopilot: false},
+    player_1_paddle = {dimension: {z: 10, y: 30, x: 200}, color: "red.jpg", autopilot: false},
+    player_2_paddle = {dimension: {z: 10, y: 30, x: 200}, color: "blue.jpg", autopilot: false},
     trapWall = {color: 0xFF0000, width: 575, startDim: {x: 50, y: 10, z: 50}, dimension: {x: 0, y: 0, z: 50}, timestamp: 0, status: "inactive"},
     player1Item = "none",
     player2Item = "none",
     fieldItem = {name: "", instance: "", dimension: {x: 50, y: 50, z: 50}, timestamp: Date.now()},
     farItem = {status: "inactive", player: 0},
-    freezeBall = {instance: "", status: "inactive", color: 0xB4CFFA, player: 0, radius: 10, pos: 0, freeze: 0},
+    freezeBall = {instance: "", status: "inactive", color: "ice.jpg", player: 0, radius: 10, pos: 0, freeze: 0},
     fieldRotation = {player: 0, status: "inactive"},
     ballControl = {player: 0, status: "inactive", timestamp: 0},
     paddleIncrease = {player: 0, status: "inactive", timestamp: 0},
@@ -80,7 +80,6 @@ function startGame(players){
         fieldItem.dimension.x *= 2;
         fieldItem.dimension.y *= 2;
         fieldItem.dimension.z *= 2;
-
     }
     else{
         player_1_paddle.dimension.x /= 2;
@@ -507,7 +506,6 @@ function paddleControl(){
             paddle1.position.x -= 10;
             primaryCamera.lookAt(new THREE.Vector3( 0, 0, 0 ));
         }
-
     }
 
     // player 1 go right
@@ -601,13 +599,6 @@ function paddleControl(){
                 ballJump(ball);
                 loosePower(1);
                 break;
-            /*case "farLimiter":
-                if(farItem.status === "inactive"){
-                    farItem.player = 1;
-                    farItem.status = "active";
-                    loosePower(1);
-                }
-                break;*/
             case "baskIceBall":
                 if(freezeBall.status === "inactive"){
                     freezeBall.player = 1;
@@ -632,29 +623,16 @@ function paddleControl(){
                     loosePower(1);
                 }
                 break;
-            /*case "paddleIncrease":
-                if(paddleIncrease.status === "inactive") {
-                    increasePaddle(1);
-                    loosePower(1);
-                }
-                break;*/
         }
     }
 
     // player 2 special power
-    if(Key.isDown(190)){
+    if(Key.isDown(76)){
         switch (player2Item){
             case "jump":
                 ballJump(ball);
                 loosePower(2);
                 break;
-            /*case "farLimiter":
-                if(farItem.status === "inactive"){
-                    farItem.player = 2;
-                    farItem.status = "active";
-                    loosePower(2);
-                }
-                break;*/
             case "baskIceBall":
                 if(freezeBall.status === "inactive"){
                     freezeBall.player = 2;
@@ -679,12 +657,6 @@ function paddleControl(){
                     loosePower(2);
                 }
                 break;
-            /*case "paddleIncrease":
-                if(paddleIncrease.status === "inactive") {
-                    increasePaddle(2);
-                    loosePower(2);
-                }
-                break;*/
         }
     }
 
@@ -723,6 +695,15 @@ function paddleControl(){
     if(Key.isDown(48)){
         activateTripWall();
     }
+
+    // ACTIVATE/DEACTIVATE SHADOWS
+    /*if(Key.isDown(72)){
+        renderer.shadowMap.enabled = true;
+        render.needsUpdate = true;
+        primaryCamera.updateProjectionMatrix()
+        console.log(renderer.shadowMap.enabled);
+
+    }*/
 }
 
 function paddleAutopilot(){
@@ -834,9 +815,9 @@ function render() {
         renderer.setViewport(left, bottom, width, height);
         renderer.setScissor(left, bottom, width, height);
         renderer.setScissorTest(true);
-        secondCamera.aspect = width / height;
-        secondCamera.updateProjectionMatrix();
-        renderer.render(scene, secondCamera);
+        primaryCamera.aspect = width / height;
+        primaryCamera.updateProjectionMatrix();
+        renderer.render(scene, primaryCamera);
 
         left = 1;
         bottom = 0.5 * SCREEN_H + 1;
@@ -845,9 +826,9 @@ function render() {
         renderer.setViewport(left, bottom, width, height);
         renderer.setScissor(left, bottom, width, height);
         renderer.setScissorTest(true); // clip out "viewport"
-        primaryCamera.aspect = width / height;
-        primaryCamera.updateProjectionMatrix();
-        renderer.render(scene, primaryCamera);
+        secondCamera.aspect = width / height;
+        secondCamera.updateProjectionMatrix();
+        renderer.render(scene, secondCamera);
     }
     else{
         left = 1;
@@ -969,12 +950,14 @@ function render() {
 
                 if(freezeBall.player === 1){
                     freezeBall.freeze = 2;
-                    paddle2.material.color.setHex(freezeBall.color);
+                    paddle2.material.map = THREE.ImageUtils.loadTexture('images/' + freezeBall.color);
+                    paddle2.material.needsUpdate = true;
                     freezeBall.pos = paddle2.position.x;
                 }
                 else if(freezeBall.player === 2){
                     freezeBall.freeze = 1;
-                    paddle1.material.color.setHex(freezeBall.color);
+                    paddle1.material.map = THREE.ImageUtils.loadTexture('images/' + freezeBall.color);
+                    paddle1.material.needsUpdate = true;
                     freezeBall.pos = paddle1.position.x;
                 }
 
@@ -1033,10 +1016,12 @@ function unfreezePlayer(player){
     freezeBall.pos = 0;
 
     if(player === 1){
-        paddle1.material.color.setHex(player_1_paddle.color);
+        paddle1.material.map = THREE.ImageUtils.loadTexture('images/' + player_1_paddle.color);
+        paddle1.material.needsUpdate = true;
     }
     else if(player === 2){
-        paddle2.material.color.setHex(player_2_paddle.color);
+        paddle2.material.map = THREE.ImageUtils.loadTexture('images/' + player_2_paddle.color);
+        paddle2.material.needsUpdate = true;
     }
 }
 
@@ -1223,7 +1208,7 @@ function init() {
 
     renderer = new THREE.WebGLRenderer( { antialias: true } );
     renderer.shadowMap.type = THREE.PCFShadowMap;
-    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.enabled = false;
     renderer.setSize(WIDTH, HEIGHT);
     renderer.setClearColor(0x000000, 1);
     container.appendChild(renderer.domElement);
@@ -1326,11 +1311,13 @@ function init() {
     renderer.domElement.style.cursor = 'none';
 }
 
-function addPaddle(paddle_prop, color_paddle) {
+function addPaddle(paddle_prop, texture_paddle) {
     var paddleGeometry = new THREE.CubeGeometry(paddle_prop.x, paddle_prop.y, paddle_prop.z, 1, 1, 1),
-        paddleMaterial = new THREE.MeshLambertMaterial({
+        /*paddleMaterial = new THREE.MeshLambertMaterial({
             color: color_paddle
-        }),
+        }),*/
+        paddleImage = THREE.ImageUtils.loadTexture('images/'+texture_paddle),
+        paddleMaterial = new THREE.MeshPhongMaterial({map: paddleImage}),
         paddle = new THREE.Mesh(paddleGeometry, paddleMaterial);
     paddle.receiveShadow = false;
     paddle.castShadow = true;
