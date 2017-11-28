@@ -243,10 +243,10 @@ function processBallMovement() {
     if(fieldItem.instance !== ""){
         fieldItem.instance.rotation.y += 0.1;
 
-        if (fieldItem.instance.position.y >= 20){
+        if (fieldItem.instance.position.y >= 70){
             itemDirection = -1;
         }
-        else if(fieldItem.instance.position.y <= 0){
+        else if(fieldItem.instance.position.y <= 50){
             itemDirection = 1;
         }
 
@@ -1185,6 +1185,7 @@ function generateRandomItem(){
 
     item.position.z = -1000 + Math.floor((Math.random() * 2000) + 1);
     item.position.x = -500 + Math.floor((Math.random() * 1000) + 1);
+    item.position.y = 50;
     return item;
 }
 
@@ -1199,6 +1200,8 @@ function generateTrapWall(pos){
         wall = new THREE.Mesh(itemGeometry, wallMaterial);
 
     // adding wall to scene
+    wall.receiveShadow = true;
+    wall.castShadow = true;
     scene.add(wall);
 
     // defining wall positions
@@ -1213,7 +1216,9 @@ function generateTrapWall(pos){
 function init() {
     container = document.getElementById('container');
 
-    renderer = new THREE.WebGLRenderer();
+    renderer = new THREE.WebGLRenderer( { antialias: true } );
+    renderer.shadowMap.type = THREE.PCFShadowMap;
+    renderer.shadowMap.enabled = true;
     renderer.setSize(WIDTH, HEIGHT);
     renderer.setClearColor(0x000000, 1);
     container.appendChild(renderer.domElement);
@@ -1228,14 +1233,7 @@ function init() {
     scene.add(primaryCamera);
     scene.add(secondCamera);
 
-    var fieldGeometry = new THREE.CubeGeometry(FIELD_WIDTH, 5, FIELD_LENGTH, 1, 1, 1),
-    textureImage = THREE.ImageUtils.loadTexture('images/football-field.jpg');
-    var fieldMaterial = new THREE.MeshPhongMaterial({map: textureImage});
-    field = new THREE.Mesh(fieldGeometry, fieldMaterial);
-    field.position.set(0, -50, 0);
-
     // set paddles
-    scene.add(field);
     paddle1 = addPaddle(player_1_paddle.dimension,player_1_paddle.color);
     paddle1.position.z = FIELD_LENGTH / 2;
     paddle2 = addPaddle(player_2_paddle.dimension,player_2_paddle.color);
@@ -1250,10 +1248,12 @@ function init() {
 
     // set ball
     var ballGeometry = new THREE.SphereGeometry(BALL_RADIUS, 16, 16),
-        ballMaterial = new THREE.MeshBasicMaterial({
+        ballMaterial = new THREE.MeshLambertMaterial({
             map: ballTexture
         });
     ball = new THREE.Mesh(ballGeometry, ballMaterial);
+    ball.receiveShadow = true;
+    ball.castShadow = true;
     scene.add(ball);
 
     primaryCamera.lookAt(ball.position);
@@ -1265,8 +1265,32 @@ function init() {
 
     // set "sun"
     sunLight = new THREE.PointLight( 0xffffff, 1, 30000 );
+
+    // set shadow
+    sunLight.castShadow = true;
+    sunLight.receiveShadow = false;
+
+    //Set up shadow properties for the light
+    sunLight.shadow.mapSize.width = 512;  // default
+    sunLight.shadow.mapSize.height = 512; // default
+    sunLight.shadow.camera.near = 0.5;       // default
+    sunLight.shadow.camera.far = 9000;      // default
+
     moveSun();
     scene.add(sunLight);
+
+    // sun helper
+    var helper = new THREE.CameraHelper( sunLight.shadow.camera );
+    scene.add( helper );
+
+    var fieldGeometry = new THREE.CubeGeometry(FIELD_WIDTH, 5, FIELD_LENGTH, 1, 1, 1),
+        textureImage = THREE.ImageUtils.loadTexture('images/football-field.jpg');
+    var fieldMaterial = new THREE.MeshPhongMaterial({map: textureImage});
+    field = new THREE.Mesh(fieldGeometry, fieldMaterial);
+    field.position.set(0, -20, 0);
+    field.castShadow = false;
+    field.receiveShadow = true;
+    scene.add(field);
 
     var sunGeometry = new THREE.SphereGeometry(500, 32, 32);
     var sunTexture = THREE.ImageUtils.loadTexture('images/sun.jpg');
@@ -1300,6 +1324,8 @@ function addPaddle(paddle_prop, color_paddle) {
             color: color_paddle
         }),
         paddle = new THREE.Mesh(paddleGeometry, paddleMaterial);
+    paddle.receiveShadow = false;
+    paddle.castShadow = true;
     scene.add(paddle);
 
     return paddle;
@@ -1310,6 +1336,8 @@ function addItem(){
         itemMaterial = new THREE.MeshPhongMaterial({map: itemImage}),
         itemGeometry = new THREE.CubeGeometry(fieldItem.dimension.x, fieldItem.dimension.y, fieldItem.dimension.z, 1, 1, 1),
         item = new THREE.Mesh(itemGeometry, itemMaterial);
+    item.receiveShadow = false;
+    item.castShadow = true;
     scene.add(item);
 
     return item;
