@@ -508,7 +508,10 @@ function paddleControl(){
         }
         else if (paddle1.position.x > -(600-player_1_paddle.dimension.x/2)){
             paddle1.position.x -= 10;
-            primaryCamera.lookAt(new THREE.Vector3( 0, 0, 0 ));
+            if(fieldRotation.status === "inactive"){
+                primaryCamera.lookAt(new THREE.Vector3( 0, 0, 0 ));
+            }
+
         }
     }
 
@@ -519,7 +522,9 @@ function paddleControl(){
         }
         else if(paddle1.position.x < (600-player_1_paddle.dimension.x/2)){
             paddle1.position.x += 10;
-            primaryCamera.lookAt(new THREE.Vector3( 0, 0, 0 ));
+            if(fieldRotation.status === "inactive") {
+                primaryCamera.lookAt(new THREE.Vector3(0, 0, 0));
+            }
         }
     }
 
@@ -531,7 +536,9 @@ function paddleControl(){
         }
         else if (paddle2.position.x < (600-player_2_paddle.dimension.x/2)){
             paddle2.position.x += 10;
-            secondCamera.lookAt(new THREE.Vector3( 0, 0, 0 ));
+            if(fieldRotation.status === "inactive") {
+                secondCamera.lookAt(new THREE.Vector3(0, 0, 0));
+            }
         }
     }
 
@@ -544,13 +551,15 @@ function paddleControl(){
         }
         else if (paddle2.position.x > -(600-player_2_paddle.dimension.x/2)){
             paddle2.position.x -= 10;
-            secondCamera.lookAt(new THREE.Vector3( 0, 0, 0 ));
+            if(fieldRotation.status === "inactive") {
+                secondCamera.lookAt(new THREE.Vector3(0, 0, 0));
+            }
         }
     }
 
     // player 1 camera up
     if(Key.isDown(87)){
-        if (cameraPosition.height.player1 < CAMERA_MAX_HEIGHT) {
+        if (cameraPosition.height.player1 < CAMERA_MAX_HEIGHT && fieldRotation.status === "inactive") {
             cameraPosition.height.player1 += 10;
             cameraPosition.distance.player1 += 10;
 
@@ -562,7 +571,7 @@ function paddleControl(){
 
     // player 1 camera down
     if(Key.isDown(83)){
-        if (cameraPosition.height.player1 > CAMERA_MIN_HEIGHT) {
+        if (cameraPosition.height.player1 > CAMERA_MIN_HEIGHT && fieldRotation.status === "inactive") {
             cameraPosition.height.player1 -= 10;
             cameraPosition.distance.player1 -= 10;
 
@@ -574,7 +583,7 @@ function paddleControl(){
 
     // player 2 camera up
     if(Key.isDown(38)){
-        if (cameraPosition.height.player2 < CAMERA_MAX_HEIGHT) {
+        if (cameraPosition.height.player2 < CAMERA_MAX_HEIGHT && fieldRotation.status === "inactive") {
             cameraPosition.height.player2 += 10;
             cameraPosition.distance.player2 -= 10;
 
@@ -586,7 +595,7 @@ function paddleControl(){
 
     // player 2 camera down
     if(Key.isDown(40)){
-        if (cameraPosition.height.player2 > CAMERA_MIN_HEIGHT) {
+        if (cameraPosition.height.player2 > CAMERA_MIN_HEIGHT && fieldRotation.status === "inactive") {
             cameraPosition.height.player2 -= 10;
             cameraPosition.distance.player2 += 10;
 
