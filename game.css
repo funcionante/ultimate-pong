@@ -13,18 +13,19 @@ body{
 .player_power {
     position: absolute;
     border: 3px solid #FFF;
-    border-radius: 5px;
+    border-radius: 50px;
+    background: white;
     color: #FFF;
     font-family: arial;
 }
 .player_1_score {
-    background: #AA3333;
+    background: #7A0000;
     font-weight: bold;
     height: 28px;
     width: 28px;
 }
 .player_2_score {
-    background: #3F51B5;
+    background: #006680;
     font-weight: bold;
     height: 28px;
     width: 28px;

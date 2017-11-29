@@ -89,12 +89,14 @@ function startGame(players){
     $( "#menu" ).hide();
 
     //get the scoreboard element.
-    player_1_score = document.getElementById('player_1_score'),
-    player_2_score = document.getElementById('player_2_score'),
+    player_1_score = document.getElementById('player_1_score');
+    player_2_score = document.getElementById('player_2_score');
 
     //playerPower
-    player_1_power = document.getElementById('player_1_power'),
-    player_2_power = document.getElementById('player_2_power'),
+    player_1_power = document.getElementById('player_1_power');
+    player_2_power = document.getElementById('player_2_power');
+    player_1_power.style.visibility = "hidden";
+    player_2_power.style.visibility = "hidden";
 
     init();
 }
@@ -239,7 +241,7 @@ function processBallMovement() {
         hitBallBack(paddle2);
     }
 
-    // if item exists, rotate
+    // if item exists,
     if(fieldItem.instance !== ""){
         fieldItem.instance.rotation.y += 0.05;
 
@@ -308,22 +310,24 @@ function isPastPaddle1() {
 function gainPower(itemName, playerNumber){
     if(playerNumber === 1){
         player1Item = itemName;
-        player_1_power.innerHTML ='<img src="images/items/'+itemName+'.jpg" height="40px" width="40px">';
+        player_1_power.innerHTML ='<img src="images/items/'+itemName+'.png" height="40px" width="40px">';
+        player_1_power.style.visibility = "visible";
     }
     else if(playerNumber === 2){
         player2Item = itemName;
-        player_2_power.innerHTML ='<img src="images/items/'+itemName+'.jpg" height="40px" width="40px">';
+        player_2_power.innerHTML ='<img src="images/items/'+itemName+'.png" height="40px" width="40px">';
+        player_2_power.style.visibility = "visible";
     }
 }
 
 function loosePower(playerNumber){
     if(playerNumber === 1){
         player1Item = "none";
-        player_1_power.innerHTML ='<img src="images/items/none.jpg" height="40px" width="40px">';
+        player_1_power.style.visibility = "hidden";
     }
     else if(playerNumber === 2){
         player2Item = "none";
-        player_2_power.innerHTML ='<img src="images/items/none.jpg" height="40px" width="40px">';
+        player_2_power.style.visibility = "hidden";
     }
 }
 

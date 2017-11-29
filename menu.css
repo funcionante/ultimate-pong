@@ -1,8 +1,7 @@
 @import url(https://fonts.googleapis.com/css?family=Shadows+Into+Light);
 
 body {
-    background:orange;
-
+    background-image: url("images/background-universe.jpg");
 }
 
 #exit {
@@ -21,13 +20,13 @@ body {
     text-align:center;
     font-size:20px;
     background-size: 1px 300%;
-    color:orange;
+    color:white;
     font-family:shadows into light;
 }
 
 #exit:hover {
     color:white;
-    background:#7A0000;
+    background:#AA3333;
     -webkit-transform:rotate(-1deg);
     transform:rotate(-2deg);
 }
@@ -52,8 +51,9 @@ body {
 }
 
 .tooltip .tooltiptext {
+    margin-top: 5px;
     visibility: hidden;
-    width: 220px;
+    width: 380px;
     background-color: black;
     color: #fff;
     text-align: center;
@@ -62,7 +62,7 @@ body {
 
     /* Position the tooltip */
     position: absolute;
-    z-index: 1;
+    z-index: 10;
 }
 
 .tooltip:hover .tooltiptext {
@@ -83,10 +83,6 @@ body {
     left:2px;
 
 
-
-
-
-
 }
 
 #single {
@@ -102,7 +98,7 @@ body {
     background-size: 1px 300%;
     -webkit-transition:0.5s;
     transition:0.5s;
-    color:orange;
+    color:white;
     font-family:shadows into light;
 
     cursor:pointer;
@@ -149,22 +145,22 @@ body {
 #left {
     height:100px;
     width:600px;
-    background:orange;
+    background:white;
     position:absolute;
     z-index:6;
-    -webkit-transform:rotate(45deg);
-    transform:rotate(45deg);
+    -webkit-transform:rotate(4555);
+    transform:rotate(55deg);
     top:-175px;
     right:-104px;
 }
 #right {
     height:100px;
     width:600px;
-    background:orange;
+    background:white;
     position:absolute;
     top:-229px;
-    -webkit-transform:rotate(-45deg);
-    transform:rotate(-45deg);
+    -webkit-transform:rotate(-55deg);
+    transform:rotate(-55deg);
     z-index:7;
     left:-56px;
 }
@@ -189,7 +185,7 @@ body {
     text-align:center;
     font-size:30px;
     font-family:shadows into light;
-    color:orange;
+    color:white;
     -webkit-transition:0.5s;
     transition:0.5s;
     cursor:pointer;
@@ -215,7 +211,7 @@ body {
     font-size:30px;
     text-align:center;
     font-family:shadows into light;
-    color:orange;
+    color:white;
     -webkit-transition:0.5s;
     transition:0.5s;
     cursor:pointer;
@@ -239,15 +235,41 @@ body {
     right:150px;
     text-align:center;
     font-family:shadows into light;
-    color:orange;
+    color:white;
     -webkit-transition:0.5s;
     transition:0.5s;
     cursor:pointer;
+    z-index:50;
 
 }
 
 #credits p {
     position:relative;
     top:0px;
+
+}
+
+#help {
+    height:50px;
+    width:200px;
+    position:relative;
+    background:#006680;
+    bottom:390px;
+    font-size:30px;
+    right:100px;
+    text-align:center;
+    font-family:shadows into light;
+    color:white;
+    -webkit-transition:0.5s;
+    transition:0.5s;
+    cursor:pointer;
+
+}
+
+#help:hover {
+    background:#7A0000;
+    color:white;
+    -webkit-transform:rotate(-2deg);
+    transform:rotate(-2deg);
 
 }

@@ -28,7 +28,6 @@
                 <img src="images/logo.png" width="20%" height="20%">
             </div>
             <div id="allthethings">
-                <div id="left"></div>
                 <div onclick="startGame(1)" id="single"><p>SINGLE PLAYER</p></div>
                 <div onclick="startGame(2)" id="multiplayer"><p>MULTIPLAYER</p></div>
                 <div id="options"><p><input id="difficulty" type="checkbox" data-on-text="Easy" data-off-text="Hard" name="my-checkbox" checked></p></div>
@@ -37,19 +36,17 @@
                         <span class="tooltiptext">Denis Bartashevich, 76537<br>Leonardo Oliveira, 76725</span>
                     </div></p>
                 </div>
-                <div id="right"></div>
-                <div id="exit">
-                    <div class="tooltip">?
-                        <span class="tooltiptext" style="z-index: 100">Player 1: WASD and Space<br>Player 2: Arrows and L</span>
-                    </div>
+                <div id="help">
+                    <p><div class="tooltip">HELP
+                    <span class="tooltiptext">Red Player: WASD and Space<br>Blue Player: Arrows and L</span>
+                </div></p>
                 </div>
-                <div id="circle"></div>
             </div>
         </div>
 
         <!-- Result -->
-        <div id="result" style="position:absolute;width: 100%;height: 100%;top:20%; left: 15%;display: none;">
-            <img onClick="location.href=location.href" src="images/gameover.png" width="70%" height="50%">
+        <div id="result" style="position:absolute;width: 100%;height: 100%;top:30%; left: 0;display: none;">
+            <img onClick="location.href=location.href" src="images/gameover.png" style="display: block; margin: 0 auto;">
         </div>
     </div>
 
