@@ -172,10 +172,10 @@ function activateRotation(player){
 function executeRotation(){
     if(fieldRotation.status === "active"){
         if(fieldRotation.player === 1){
-            if(secondCamera.rotation.z <= 5 * Math.PI){
+            if(secondCamera.rotation.z <= 3 * Math.PI){
                 secondCamera.rotation.z += 0.1;
-                if(secondCamera.rotation.z > 5 * Math.PI){
-                    secondCamera.rotation.z = Math.PI;
+                if(secondCamera.rotation.z > 3 * Math.PI){
+                    secondCamera.rotation.z = - Math.PI;
                     fieldRotation.status = "inactive";
                 }
             }
