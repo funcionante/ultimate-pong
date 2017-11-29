@@ -1254,7 +1254,8 @@ function init() {
     secondCamera.lookAt(ball.position);
 
     // set light
-    mainLight = new THREE.HemisphereLight(0xFFFFFF, 0x003300, 0.6);
+    // mainLight = new THREE.HemisphereLight(0xFFFFFF, 0x003300, 0.6);
+    mainLight = new THREE.AmbientLight( 0xffffff, 0.1 );
     scene.add(mainLight);
 
     // set "sun"
