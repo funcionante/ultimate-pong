@@ -1,7 +1,7 @@
 @import url(https://fonts.googleapis.com/css?family=Shadows+Into+Light);
 
 body {
-    background-image: url("images/background-universe.jpg");
+    background-image: url("../images/background-universe.jpg");
 }
 
 #exit {
