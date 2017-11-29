@@ -45,7 +45,7 @@ var WIDTH = window.innerWidth,
     itemDirection = 1,
     backgroundSphere,
     cameraPosition = {height: {player1: CAMERA_MIN_HEIGHT, player2: CAMERA_MIN_HEIGHT}, distance: {player1: CAMERA_MIN_DISTANCE, player2: -CAMERA_MIN_DISTANCE}},
-    moonAngle = 2.0;
+    moonAngle = 2.3;
 
 function gameOver(){
     if(score.player1 >= GAME_OVER){
@@ -1265,13 +1265,12 @@ function init() {
     primaryCamera.lookAt(ball.position);
     secondCamera.lookAt(ball.position);
 
-    // set light
-    // mainLight = new THREE.HemisphereLight(0xFFFFFF, 0x003300, 0.6);
-    mainLight = new THREE.AmbientLight( 0xffffff, 0.1 );
+    // set ambient light
+    mainLight = new THREE.AmbientLight(0xffffff, 0.2);
     scene.add(mainLight);
 
-    // set "sun"
-    sunLight = new THREE.PointLight( 0xffffff, 1, 30000 );
+    // set "sun" light
+    sunLight = new THREE.PointLight(0xffffff, 1.2, 30000);
 
     // set shadow
     sunLight.castShadow = true;
