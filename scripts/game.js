@@ -26,7 +26,7 @@ var WIDTH = window.innerWidth,
 
     //declare members.
     container, renderer, primaryCamera, mainLight, moon, secondCamera,
-    scene, ball, paddle1, paddle2, field, running,multiplayer = false, shadows = false,
+    scene, ball, paddle1, paddle2, field, running, multiplayer = false, shadows = false,
     score = {
         player1: 0,
         player2: 0
@@ -46,6 +46,14 @@ var WIDTH = window.innerWidth,
     backgroundSphere,
     cameraPosition = {height: {player1: CAMERA_MIN_HEIGHT, player2: CAMERA_MIN_HEIGHT}, distance: {player1: CAMERA_MIN_DISTANCE, player2: -CAMERA_MIN_DISTANCE}},
     moonAngle = 2.3;
+
+window.onresize = function(event) {
+    WIDTH = window.innerWidth;
+    HEIGHT = window.innerHeight;
+    ASPECT = WIDTH / HEIGHT;
+    renderer.setSize(WIDTH, HEIGHT);
+
+};
 
 function gameOver(){
     if(score.player1 >= GAME_OVER){
