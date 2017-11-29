@@ -261,7 +261,7 @@ function processBallMovement() {
                     activateTripWall();
                 }
             }
-            else if(fieldItem.name === "farLimiter"){
+            /*else if(fieldItem.name === "farLimiter"){
                 if(farItem.status === "inactive") {
                     if(ball.$velocity.z < 0) {
                         farItem.player = 1;
@@ -279,7 +279,7 @@ function processBallMovement() {
                 else{
                     increasePaddle(2);
                 }
-            }
+            }*/
             else{
                 if(ball.$velocity.z < 0){
                     gainPower(fieldItem.name,1);
@@ -612,6 +612,13 @@ function paddleControl(){
                 ballJump(ball);
                 loosePower(1);
                 break;
+            case "farLimiter":
+                if(farItem.status === "inactive"){
+                    farItem.player = 1;
+                    farItem.status = "active";
+                    loosePower(1);
+                }
+                break;
             case "baskIceBall":
                 if(freezeBall.status === "inactive"){
                     freezeBall.player = 1;
@@ -636,6 +643,12 @@ function paddleControl(){
                     loosePower(1);
                 }
                 break;
+            case "paddleIncrease":
+                if(paddleIncrease.status === "inactive") {
+                    increasePaddle(1);
+                    loosePower(1);
+                }
+                break;
         }
     }
 
@@ -645,6 +658,13 @@ function paddleControl(){
             case "jump":
                 ballJump(ball);
                 loosePower(2);
+                break;
+            case "farLimiter":
+                if(farItem.status === "inactive"){
+                    farItem.player = 2;
+                    farItem.status = "active";
+                    loosePower(2);
+                }
                 break;
             case "baskIceBall":
                 if(freezeBall.status === "inactive"){
@@ -670,14 +690,21 @@ function paddleControl(){
                     loosePower(2);
                 }
                 break;
+            case "paddleIncrease":
+                if(paddleIncrease.status === "inactive") {
+                    increasePaddle(2);
+                    loosePower(2);
+                }
+                break;
         }
     }
 
     // CHEATS PLAYER 1
     if(Key.isDown(49)){
-        if(paddleIncrease.status === "inactive") {
+        gainPower("paddleIncrease", 1);
+        /*if(paddleIncrease.status === "inactive") {
             increasePaddle(1);
-        }
+        }*/
     }
 
     if(Key.isDown(50)){
@@ -697,10 +724,11 @@ function paddleControl(){
     }
 
     if(Key.isDown(54)){
-        if(farItem.status === "inactive") {
+        gainPower("farLimiter", 1);
+        /*if(farItem.status === "inactive") {
             farItem.player = 1;
             farItem.status = "active";
-        }
+        }*/
     }
 
     // GENERAL CHEATS
