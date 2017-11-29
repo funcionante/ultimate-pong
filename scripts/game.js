@@ -26,7 +26,7 @@ var WIDTH = window.innerWidth,
 
     //declare members.
     container, renderer, primaryCamera, mainLight, moon, secondCamera,
-    scene, ball, paddle1, paddle2, field, running,multiplayer = false,
+    scene, ball, paddle1, paddle2, field, running,multiplayer = false, shadows = false,
     score = {
         player1: 0,
         player2: 0
@@ -701,13 +701,16 @@ function paddleControl(){
     }
 
     // ACTIVATE/DEACTIVATE SHADOWS
-    /*if(Key.isDown(72)){
-        renderer.shadowMap.enabled = true;
-        render.needsUpdate = true;
-        primaryCamera.updateProjectionMatrix()
-        console.log(renderer.shadowMap.enabled);
-
-    }*/
+    if(Key.isDown(72)){
+        // set shadow
+        if(shadows){
+            sunLight.castShadow = !sunLight.castShadow;
+            shadows = false;
+        }
+    }
+    else{
+        shadows = true;
+    }
 }
 
 function paddleAutopilot(){
@@ -1136,7 +1139,7 @@ function reducePlayerFar(player){
 function createFreezeBall(player){
     var freezeBallInstance = new THREE.SphereGeometry(freezeBall.radius, 5, 5),
         freezeBallMaterial = new THREE.MeshLambertMaterial({
-            color: freezeBall.color
+            color: 0xD4F0FF
         }),
     baskIceBall = new THREE.Mesh(freezeBallInstance, freezeBallMaterial);
     // set shadow
@@ -1210,7 +1213,7 @@ function generateTrapWall(pos){
 function init() {
     container = document.getElementById('container');
 
-    renderer = new THREE.WebGLRenderer( { antialias: true } );
+    renderer = new THREE.WebGLRenderer({antialias : true});
     renderer.shadowMap.type = THREE.PCFShadowMap;
     renderer.shadowMap.enabled = true;
     renderer.setSize(WIDTH, HEIGHT);
