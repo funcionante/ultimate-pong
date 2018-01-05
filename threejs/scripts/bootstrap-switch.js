@@ -9,9 +9,9 @@
 
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(['jquery'], factory);
+    define(['threejs/scripts/jquery'], factory);
   } else if (typeof exports !== "undefined") {
-    factory(require('jquery'));
+    factory(require('threejs/scripts/jquery'));
   } else {
     var mod = {
       exports: {}
